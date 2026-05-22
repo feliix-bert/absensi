@@ -59,12 +59,8 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
             <MapPin size={18} className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-emerald-800">Dalam radius kantor</p>
-            <p className="text-xs text-neutral-500 mt-0.5">± 45 m · {officeShort}</p>
-            <p className="text-[11px] text-emerald-600 font-medium mt-2 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              GPS aktif
-            </p>
+            <p className="text-sm font-semibold text-emerald-800">Lokasi Kantor Anda</p>
+            <p className="text-xs text-neutral-500 mt-0.5">{profile?.offices?.nama}</p>
           </div>
         </div>
       </div>

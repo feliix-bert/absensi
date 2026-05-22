@@ -1,25 +1,27 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCheck, Info, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
-import { MOCK_NOTIFICATIONS } from '@/lib/mock-data';
-import type { Notification } from '@/lib/types';
+import { CheckCheck, Info, CheckCircle2, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
+import { useNotifications, NotificationItem as NotifItemType } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
 
-const TYPE_ICONS = {
+const TYPE_ICONS: Record<string, any> = {
   info: Info,
   success: CheckCircle2,
   warning: AlertTriangle,
   error: AlertCircle,
+  attendance: CheckCircle2,
+  reminder: Info,
 };
 
-const TYPE_STYLES = {
+const TYPE_STYLES: Record<string, string> = {
   info: 'bg-blue-50 text-blue-600',
   success: 'bg-success-50 text-success-600',
   warning: 'bg-warning-50 text-warning-600',
   error: 'bg-danger-50 text-danger-600',
+  attendance: 'bg-primary-50 text-primary-600',
+  reminder: 'bg-amber-50 text-amber-600',
 };
 
 function formatNotifTime(iso: string) {
@@ -38,34 +40,36 @@ function NotificationItem({
   item,
   onMarkRead,
 }: {
-  item: Notification;
+  item: NotifItemType;
   onMarkRead: (id: string) => void;
 }) {
-  const Icon = TYPE_ICONS[item.type];
+  const Icon = TYPE_ICONS[item.type] || Info;
+  const style = TYPE_STYLES[item.type] || TYPE_STYLES.info;
+
   return (
     <motion.button
       type="button"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      onClick={() => !item.isRead && onMarkRead(item.id)}
+      onClick={() => !item.is_read && onMarkRead(item.id)}
       className={cn(
         'card p-4 w-full text-left transition-colors',
-        !item.isRead && 'border-primary-100 bg-primary-50/30'
+        !item.is_read && 'border-primary-100 bg-primary-50/30'
       )}
     >
       <div className="flex gap-3">
-        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', TYPE_STYLES[item.type])}>
+        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', style)}>
           <Icon size={18} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className={cn('text-body-md font-semibold', item.isRead ? 'text-neutral-700' : 'text-neutral-900')}>
+            <p className={cn('text-body-md font-semibold', item.is_read ? 'text-neutral-700' : 'text-neutral-900')}>
               {item.title}
             </p>
-            {!item.isRead && <span className="w-2 h-2 rounded-full bg-primary-600 flex-shrink-0 mt-1.5" />}
+            {!item.is_read && <span className="w-2 h-2 rounded-full bg-primary-600 flex-shrink-0 mt-1.5" />}
           </div>
-          <p className="text-body-sm text-neutral-500 mt-0.5 leading-relaxed">{item.body}</p>
-          <p className="text-[11px] text-neutral-400 mt-2">{formatNotifTime(item.createdAt)}</p>
+          <p className="text-body-sm text-neutral-500 mt-0.5 leading-relaxed">{item.message}</p>
+          <p className="text-[11px] text-neutral-400 mt-2">{formatNotifTime(item.created_at)}</p>
         </div>
       </div>
     </motion.button>
@@ -73,43 +77,35 @@ function NotificationItem({
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
-
-  const unread = notifications.filter((n) => !n.isRead).length;
-
-  const markRead = (id: string) => {
-    setNotifications((list) =>
-      list.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-  };
-
-  const markAllRead = () => {
-    setNotifications((list) => list.map((n) => ({ ...n, isRead: true })));
-  };
+  const { notifications, unreadCount, loading, markAsRead, markAllRead } = useNotifications();
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
+    <div className="max-w-2xl mx-auto space-y-5 pb-10">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-heading-lg text-neutral-900">Notifikasi</h2>
           <p className="text-body-sm text-neutral-500 mt-0.5">
-            {unread > 0 ? `${unread} belum dibaca` : 'Semua sudah dibaca'}
+            {unreadCount > 0 ? `${unreadCount} belum dibaca` : 'Semua sudah dibaca'}
           </p>
         </div>
-        {unread > 0 && (
+        {unreadCount > 0 && (
           <button type="button" onClick={markAllRead} className="btn btn-ghost btn-sm text-primary-600">
             <CheckCheck size={16} /> Tandai semua
           </button>
         )}
       </div>
 
-      {notifications.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-10 text-primary-600">
+          <Loader2 className="animate-spin" size={32} />
+        </div>
+      ) : notifications.length === 0 ? (
         <EmptyState variant="notifications" />
       ) : (
         <div className="space-y-2.5">
           {notifications.map((n, i) => (
             <motion.div key={n.id} transition={{ delay: i * 0.04 }}>
-              <NotificationItem item={n} onMarkRead={markRead} />
+              <NotificationItem item={n} onMarkRead={markAsRead} />
             </motion.div>
           ))}
         </div>

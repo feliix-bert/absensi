@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { BellIcon, Search } from 'lucide-react';
-import { MOCK_USER, MOCK_NOTIFICATIONS } from '@/lib/mock-data';
 import { getInitials, getGreeting } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface HeaderProps {
   title?: string;
@@ -11,7 +12,8 @@ interface HeaderProps {
 }
 
 export function Header({ title, showSearch = false }: HeaderProps) {
-  const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length;
+  const { unreadCount } = useNotifications();
+  const profile = useAuthStore(state => state.profile);
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-neutral-100 h-16 flex items-center px-4 md:px-6 gap-4">
@@ -23,7 +25,7 @@ export function Header({ title, showSearch = false }: HeaderProps) {
           <div>
             <p className="text-body-sm text-neutral-500">{getGreeting()},</p>
             <p className="text-heading-md font-semibold text-neutral-900 truncate leading-tight">
-              {MOCK_USER.name.split(' ')[0]}
+              {profile?.nama?.split(' ')[0] || 'User'}
             </p>
           </div>
         )}
@@ -54,7 +56,7 @@ export function Header({ title, showSearch = false }: HeaderProps) {
 
         {/* Avatar */}
         <div className="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-primary-200 transition-all">
-          {getInitials(MOCK_USER.name)}
+          {getInitials(profile?.nama || 'U')}
         </div>
       </div>
     </header>

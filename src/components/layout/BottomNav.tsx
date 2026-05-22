@@ -3,21 +3,21 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, QrCode, Clock, UserCircle, Bell } from 'lucide-react';
-import { MOCK_NOTIFICATIONS } from '@/lib/mock-data';
+import { LayoutDashboard, QrCode, Clock, UserCircle, Bell, History, User } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 
-const TABS = [
+const NAV_ITEMS = [
   { id: 'dashboard', label: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
-  { id: 'history', label: 'Riwayat', href: '/history', icon: Clock },
-  { id: 'scan', label: 'Absen', href: '/location', icon: QrCode, primary: true },
+  { id: 'history', label: 'Riwayat', href: '/history', icon: History },
+  { id: 'scan', label: 'Scan', href: '/scan', icon: QrCode, primary: true },
   { id: 'notifications', label: 'Notif', href: '/notifications', icon: Bell, badge: true },
-  { id: 'profile', label: 'Profil', href: '/profile', icon: UserCircle },
+  { id: 'profile', label: 'Profil', href: '/profile', icon: User },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
-  const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length;
+  const { unreadCount } = useNotifications();
 
   return (
     <nav
@@ -26,7 +26,7 @@ export function BottomNav() {
       aria-label="Navigasi utama"
     >
       <div className="flex items-center h-full px-2">
-        {TABS.map((tab) => {
+        {NAV_ITEMS.map((tab) => {
           const isActive =
             pathname === tab.href ||
             pathname.startsWith(tab.href + '/') ||

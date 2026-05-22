@@ -13,24 +13,27 @@ import {
   ChevronRight,
   MapPin,
   LogOut,
+  History,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { MOCK_USER, MOCK_NOTIFICATIONS } from '@/lib/mock-data';
-import { getInitials } from '@/lib/utils';
+import { cn, getInitials } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { useNotifications } from '@/hooks/useNotifications';
 
-const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { id: 'scan', label: 'Absen QR', href: '/location', icon: QrCode },
+const SIDEBAR_ITEMS = [
+  { id: 'dashboard', label: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
+  { id: 'scan', label: 'Scan Absensi', href: '/scan', icon: QrCode },
+  { id: 'history', label: 'Riwayat Absensi', href: '/history', icon: History },
   { id: 'notifications', label: 'Notifikasi', href: '/notifications', icon: BellIcon },
-  { id: 'history', label: 'Riwayat', href: '/history', icon: ClockIcon },
-  { id: 'profile', label: 'Profil', href: '/profile', icon: UserCircle },
+  { id: 'profile', label: 'Profil Saya', href: '/profile', icon: User },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length;
+  const { unreadCount } = useNotifications();
+  const profile = useAuthStore((state) => state.profile);
 
   return (
     <motion.aside
@@ -70,7 +73,7 @@ export function Sidebar() {
 
       {/* ── Navigation ── */}
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto scrollbar-hide">
-        {NAV_ITEMS.map((item) => {
+        {SIDEBAR_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
             pathname.startsWith(item.href + '/') ||
@@ -149,15 +152,15 @@ export function Sidebar() {
       <div className="p-3 border-t border-neutral-100">
         <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-50 cursor-pointer transition-colors">
           <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {getInitials(MOCK_USER.name)}
+            {getInitials(profile?.nama || 'U')}
           </div>
           <motion.div
             animate={{ opacity: collapsed ? 0 : 1, width: collapsed ? 0 : 'auto' }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden whitespace-nowrap min-w-0"
           >
-            <p className="text-body-sm font-medium text-neutral-900 truncate">{MOCK_USER.name}</p>
-            <p className="text-[11px] text-neutral-400 truncate">{MOCK_USER.division}</p>
+            <p className="text-body-sm font-medium text-neutral-900 truncate">{profile?.nama || 'User'}</p>
+            <p className="text-[11px] text-neutral-400 truncate">{profile?.divisi || '-'}</p>
           </motion.div>
         </div>
       </div>

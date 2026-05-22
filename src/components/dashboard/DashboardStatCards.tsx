@@ -33,8 +33,8 @@ interface DashboardStatCardsProps {
 }
 
 export function DashboardStatCards({ stats, profile }: DashboardStatCardsProps) {
-  // Try to calculate remaining days based on profile's durasi_magang or fallback to 90
-  const endDate = profile?.created_at ? new Date(new Date(profile.created_at).getTime() + 90 * 24 * 60 * 60 * 1000) : new Date();
+  // Try to calculate remaining days based on profile's selesai_magang
+  const endDate = profile?.selesai_magang ? new Date(profile.selesai_magang) : new Date();
   const remaining = getRemainingDays(endDate.toISOString());
 
   return (

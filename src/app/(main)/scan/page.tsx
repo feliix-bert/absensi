@@ -60,7 +60,8 @@ function ScanFrame({ active }: { active: boolean }) {
 }
 
 // ─── Success Overlay ─────────────────────────
-function SuccessOverlay({ onDone }: { onDone: () => void }) {
+function SuccessOverlay({ onDone, result }: { onDone: () => void, result: any }) {
+  const timeFormatted = result?.time ? new Date(result.time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -85,9 +86,9 @@ function SuccessOverlay({ onDone }: { onDone: () => void }) {
           />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Absensi Berhasil!</h2>
-        <p className="text-neutral-300 text-body-md mb-2">Masuk dicatat pada pukul 07:58</p>
+        <p className="text-neutral-300 text-body-md mb-2">{result?.type === 'keluar' ? 'Keluar' : 'Masuk'} dicatat pada pukul {timeFormatted}</p>
         <div className="inline-block bg-white/10 rounded-full px-4 py-1.5 text-white text-body-sm">
-          Gedung Graha Merah Putih
+          {result?.office_name || 'Gedung Kantor'}
         </div>
         <div className="mt-8 space-y-3 w-72">
           <Link href="/dashboard" className="btn btn-primary btn-full btn-lg">
@@ -150,6 +151,7 @@ export default function ScanPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number; acc: number } | null>(null);
   const [torchOn, setTorchOn] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [scanResult, setScanResult] = useState<any>(null);
   
   // Guard ref to prevent multiple concurrent requests
   const isProcessingScan = useRef(false);
@@ -202,6 +204,7 @@ export default function ScanPage() {
         setScanStep('invalid');
         isProcessingScan.current = false;
       } else {
+        setScanResult(res);
         setScanStep('success');
         isProcessingScan.current = false;
       }
@@ -215,6 +218,7 @@ export default function ScanPage() {
 
   const handleRetry = () => {
     isProcessingScan.current = false;
+    setScanResult(null);
     // If we have location, we can just scan again
     if (location) {
       setScanStep('scanning');
@@ -290,7 +294,7 @@ export default function ScanPage() {
 
         {/* Result overlays */}
         <AnimatePresence>
-          {scanStep === 'success' && <SuccessOverlay onDone={handleRetry} />}
+          {scanStep === 'success' && <SuccessOverlay onDone={handleRetry} result={scanResult} />}
           {(scanStep === 'invalid' || scanStep === 'expired') && (
             <ErrorOverlay type={scanStep} message={errorMsg} onRetry={handleRetry} />
           )}

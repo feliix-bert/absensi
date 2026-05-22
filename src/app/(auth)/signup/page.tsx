@@ -219,8 +219,11 @@ export default function SignupPage() {
                   <input type="hidden" name="pembimbing" value={form.mentor} />
                   
                   <div className="grid grid-cols-2 gap-3">
-                    <Field id="signup-startdate" label="Durasi Magang" error={errors.startDate}>
-                      <input id="signup-startdate" name="durasi_magang" type="text" placeholder="Misal: 3 Bulan" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
+                    <Field id="signup-startdate" label="Tanggal Mulai" error={errors.startDate}>
+                      <input id="signup-startdate" name="mulai_magang" type="date" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
+                    </Field>
+                    <Field id="signup-enddate" label="Tanggal Selesai" error={errors.endDate}>
+                      <input id="signup-enddate" name="selesai_magang" type="date" value={form.endDate} onChange={set('endDate')} className={cn('input', errors.endDate && 'input-error')} />
                     </Field>
                   </div>
 

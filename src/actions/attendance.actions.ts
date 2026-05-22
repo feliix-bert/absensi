@@ -30,7 +30,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
   // 3. Fetch Profile and Office Location
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('lokasi_kantor, offices(latitude, longitude, radius)')
+    .select('lokasi_kantor, offices(nama, latitude, longitude, radius)')
     .eq('id', user.id)
     .single()
 
@@ -63,22 +63,37 @@ export async function submitCheckIn(payload: AttendancePayload) {
 
   const { data: existingAttendance } = await supabase
     .from('attendance')
-    .select('id')
+    .select('id, check_out')
     .eq('user_id', user.id)
     .gte('check_in', todayStart)
     .lte('check_in', todayEnd)
     .single()
 
   if (existingAttendance) {
-    return { error: 'Anda sudah melakukan absensi masuk hari ini' }
+    if (existingAttendance.check_out) {
+      return { error: 'User sudah melakukan absen sebelumnya.' }
+    } else {
+      // Check out
+      const { error: updateError } = await supabase
+        .from('attendance')
+        .update({ check_out: new Date().toISOString() })
+        .eq('id', existingAttendance.id)
+        
+      if (updateError) {
+        console.error(updateError)
+        return { error: 'Gagal memproses absen keluar' }
+      }
+      return { success: true, message: 'Absen keluar berhasil', type: 'keluar', time: new Date().toISOString(), office_name: office.nama }
+    }
   }
 
   // 6. Insert Attendance Record
+  const now = new Date().toISOString()
   const { error: insertError } = await supabase
     .from('attendance')
     .insert({
       user_id: user.id,
-      check_in: new Date().toISOString(),
+      check_in: now,
       latitude: payload.latitude,
       longitude: payload.longitude,
       accuracy: payload.accuracy,
@@ -91,7 +106,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
     return { error: 'Gagal menyimpan absensi' }
   }
 
-  return { success: true, message: 'Absensi berhasil' }
+  return { success: true, message: 'Absensi berhasil', type: 'masuk', time: now, office_name: office.nama }
 }
 
 export async function getAttendanceHistory(monthYyyyMm: string) {

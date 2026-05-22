@@ -8,8 +8,8 @@ interface DashboardProgressProps {
 }
 
 export function DashboardProgress({ stats, profile }: DashboardProgressProps) {
-  const startDate = profile?.created_at || new Date().toISOString()
-  const endDate = new Date(new Date(startDate).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
+  const startDate = profile?.mulai_magang || new Date().toISOString()
+  const endDate = profile?.selesai_magang || new Date(new Date(startDate).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
   
   const progress = getInternshipProgress(startDate, endDate);
   const start = new Date(startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
