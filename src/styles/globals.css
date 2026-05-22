@@ -1,0 +1,295 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Shadcn CSS Variables */
+    --background: 0 0% 99%;
+    --foreground: 220 14% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 14% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 7%;
+    --primary: 0 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 208 67% 17%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 9% 96%;
+    --muted-foreground: 220 9% 43%;
+    --accent: 220 9% 96%;
+    --accent-foreground: 220 14% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 9% 92%;
+    --input: 220 9% 92%;
+    --ring: 0 100% 40%;
+    --radius: 0.5rem;
+
+    /* TelIntern Brand Tokens */
+    --telkom-red: #CC0000;
+    --telkom-red-light: #E60000;
+    --telkom-blue: #0E2A47;
+    --telkom-blue-deep: #0A2239;
+    --telkom-blue-light: #1A5580;
+
+    /* Surface tokens */
+    --surface-page: #F9FAFB;
+    --surface-card: #FFFFFF;
+    --surface-subtle: #F3F4F6;
+
+    /* Status tokens */
+    --status-success: #10B981;
+    --status-success-bg: #ECFDF5;
+    --status-warning: #F59E0B;
+    --status-warning-bg: #FFFBEB;
+    --status-danger: #EF4444;
+    --status-danger-bg: #FEF2F2;
+    --status-info: #3B82F6;
+    --status-info-bg: #EFF6FF;
+
+    /* Sidebar width */
+    --sidebar-width: 260px;
+    --sidebar-width-collapsed: 72px;
+    --bottom-nav-height: 72px;
+    --header-height: 64px;
+  }
+
+  .dark {
+    --background: 220 14% 7%;
+    --foreground: 0 0% 98%;
+    --card: 220 14% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 14% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 229 44% 22%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 14% 15%;
+    --muted-foreground: 220 9% 60%;
+    --accent: 220 14% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 0 100% 45%;
+    --surface-page: #0F1117;
+    --surface-card: #16181F;
+    --surface-subtle: #1C1F2A;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans;
+    min-height: 100dvh;
+  }
+}
+
+@layer components {
+  /* ─── Button System ─── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97];
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-500 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary-700 text-white hover:bg-secondary-600 shadow-sm;
+  }
+
+  .btn-outline {
+    @apply btn border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900;
+  }
+
+  /* Ghost on dark hero — high contrast, no clash with btn-outline */
+  .btn-hero-ghost {
+    @apply btn h-12 px-6 text-base rounded-lg border border-white/35 bg-white/10 text-white font-medium hover:bg-white/20 hover:border-white/50 backdrop-blur-sm;
+  }
+
+  .btn-hero-primary {
+    @apply btn h-12 px-6 text-base rounded-lg bg-primary-600 text-white font-semibold shadow-lg shadow-primary-900/25 hover:bg-primary-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600;
+  }
+
+  .btn-sm  { @apply h-8 px-3 text-sm rounded; }
+  .btn-md  { @apply h-10 px-4 text-sm; }
+  .btn-lg  { @apply h-12 px-6 text-base; }
+  .btn-xl  { @apply h-14 px-8 text-base rounded-lg; }
+  .btn-full { @apply w-full; }
+
+  /* ─── Card System ─── */
+  .card {
+    @apply bg-white rounded-2xl border border-neutral-200/90 shadow-[0_2px_12px_rgba(14,42,71,0.05)];
+  }
+
+  .card-modern {
+    @apply bg-white rounded-2xl border border-neutral-100 shadow-[0_4px_20px_rgba(14,42,71,0.06)] transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(14,42,71,0.08)];
+  }
+
+  .card-surface {
+    @apply rounded-2xl bg-neutral-50/80 border border-neutral-100;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-md hover:border-neutral-300;
+  }
+
+  .card-sm  { @apply card p-4; }
+  .card-md  { @apply card p-5; }
+  .card-lg  { @apply card p-6; }
+
+  /* ─── Input System ─── */
+  .input {
+    @apply w-full h-11 px-3.5 py-2.5 rounded-lg border border-neutral-200 bg-white text-neutral-900 text-body-md placeholder:text-neutral-400 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-0 focus:border-primary-500 disabled:opacity-50 disabled:bg-neutral-50;
+  }
+
+  .input-error {
+    @apply input border-danger-400 focus:ring-danger-500 focus:border-danger-500;
+  }
+
+  .form-label {
+    @apply block text-label-lg text-neutral-700 mb-1.5;
+  }
+
+  .form-error {
+    @apply text-body-sm text-danger-500 mt-1;
+  }
+
+  .form-hint {
+    @apply text-body-sm text-neutral-500 mt-1;
+  }
+
+  /* ─── Badge System ─── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-medium;
+  }
+
+  .badge-success { @apply badge bg-success-50 text-success-700; }
+  .badge-warning { @apply badge bg-warning-50 text-warning-700; }
+  .badge-danger  { @apply badge bg-danger-50 text-danger-700; }
+  .badge-primary { @apply badge bg-primary-50 text-primary-700; }
+  .badge-neutral { @apply badge bg-neutral-100 text-neutral-600; }
+  .badge-navy    { @apply badge bg-secondary-700 text-white; }
+
+  /* ─── Status Dot ─── */
+  .status-dot {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+  .status-dot-success { @apply status-dot bg-success-500; }
+  .status-dot-warning { @apply status-dot bg-warning-500; }
+  .status-dot-danger  { @apply status-dot bg-danger-500; }
+  .status-dot-neutral { @apply status-dot bg-neutral-400; }
+
+  /* ─── Skeleton ─── */
+  .skeleton {
+    @apply rounded-md bg-neutral-200;
+    background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  /* ─── Section ─── */
+  .section-title {
+    @apply text-heading-lg text-neutral-900 font-semibold;
+  }
+
+  .section-subtitle {
+    @apply text-body-md text-neutral-500;
+  }
+
+  /* ─── Bottom Nav ─── */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200;
+    height: var(--bottom-nav-height);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ─── Page wrapper ─── */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ─── Gradient text ─── */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400;
+  }
+
+  /* Landing hero mesh */
+  .hero-mesh {
+    background:
+      radial-gradient(ellipse 80% 60% at 85% 15%, rgba(204, 0, 0, 0.22) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(26, 85, 128, 0.35) 0%, transparent 50%),
+      linear-gradient(155deg, #061828 0%, #0A2239 35%, #0E2A47 65%, #123D5C 100%);
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .section-muted {
+    background: linear-gradient(180deg, #FAFBFC 0%, #F3F6F9 100%);
+  }
+
+  /* ─── QR Scanner Frame ─── */
+  .qr-frame-corner {
+    @apply absolute w-8 h-8 border-primary-600;
+    border-width: 3px;
+  }
+}
+
+@layer utilities {
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-top { padding-top: env(safe-area-inset-top); }
+
+  .text-balance { text-wrap: balance; }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  .transition-base {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
