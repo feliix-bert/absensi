@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, CheckCircle2, XCircle, Clock,
@@ -150,6 +150,9 @@ export default function ScanPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number; acc: number } | null>(null);
   const [torchOn, setTorchOn] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  // Guard ref to prevent multiple concurrent requests
+  const isProcessingScan = useRef(false);
 
   // 1. Request location on mount
   useEffect(() => {
@@ -180,25 +183,38 @@ export default function ScanPage() {
 
   // 2. Handle scan success
   const handleScanSuccess = async (token: string) => {
-    if (scanStep !== 'scanning' || !location) return;
+    // Check ref immediately synchronously to prevent duplicate calls
+    if (scanStep !== 'scanning' || !location || isProcessingScan.current) return;
+    
+    isProcessingScan.current = true;
     setScanStep('processing');
 
-    const res = await submitCheckIn({
-      latitude: location.lat,
-      longitude: location.lng,
-      accuracy: location.acc,
-      qrToken: token.trim() // Just in case there's whitespace
-    });
+    try {
+      const res = await submitCheckIn({
+        latitude: location.lat,
+        longitude: location.lng,
+        accuracy: location.acc,
+        qrToken: token.trim() // Just in case there's whitespace
+      });
 
-    if (res.error) {
-      setErrorMsg(res.error);
+      if (res.error) {
+        setErrorMsg(res.error);
+        setScanStep('invalid');
+        isProcessingScan.current = false;
+      } else {
+        setScanStep('success');
+        isProcessingScan.current = false;
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMsg('Terjadi kesalahan jaringan atau server');
       setScanStep('invalid');
-    } else {
-      setScanStep('success');
+      isProcessingScan.current = false;
     }
   };
 
   const handleRetry = () => {
+    isProcessingScan.current = false;
     // If we have location, we can just scan again
     if (location) {
       setScanStep('scanning');
