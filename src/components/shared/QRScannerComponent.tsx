@@ -32,7 +32,8 @@ export function QRScannerComponent({ onScanSuccess, onScanError, torchOn }: QRSc
         if (error && !(error instanceof Exception)) {
           // Exception is thrown constantly while scanning and not finding a code,
           // only report actual errors
-          if (onScanError) onScanError(error.message);
+          const err = error as Error;
+          if (onScanError) onScanError(err.message || 'Error occurred');
         }
       }
     ).catch(err => {
