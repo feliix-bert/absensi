@@ -2,11 +2,19 @@
 
 import Link from 'next/link';
 import { CalendarDays, MapPin, QrCode, ChevronRight, XCircle } from 'lucide-react';
-import { MOCK_TODAY, MOCK_USER } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 
-export function DashboardToday() {
-  const officeShort = MOCK_USER.officeLocation.split('—')[1]?.trim() ?? 'kantor';
+interface DashboardTodayProps {
+  today: any
+  profile: any
+}
+
+export function DashboardToday({ today, profile }: DashboardTodayProps) {
+  const officeShort = profile?.offices?.nama?.split('(')[1]?.replace(')','') ?? 'kantor';
+  const hasCheckedIn = !!today?.check_in;
+  const hasCheckedOut = !!today?.check_out;
+  const checkInTime = hasCheckedIn ? new Date(today.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
+  const checkOutTime = hasCheckedOut ? new Date(today.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -15,20 +23,20 @@ export function DashboardToday() {
           <CalendarDays size={18} className="text-neutral-400" />
           <h2 className="text-sm font-semibold text-neutral-800">Absensi Hari Ini</h2>
         </div>
-        {MOCK_TODAY.hasCheckedIn ? (
+        {hasCheckedIn ? (
           <>
-            <StatusBadge status={MOCK_TODAY.status ?? 'hadir'} />
+            <StatusBadge status={today.status ?? 'Hadir'} />
             <div className="grid grid-cols-2 gap-3 mt-4">
               <div className="card-surface p-3">
                 <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Masuk</p>
                 <p className="text-lg font-bold text-neutral-900 tabular-nums mt-1">
-                  {MOCK_TODAY.checkInTime ?? '--:--'}
+                  {checkInTime ?? '--:--'}
                 </p>
               </div>
               <div className="card-surface p-3">
                 <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Keluar</p>
-                <p className={`text-lg font-bold tabular-nums mt-1 ${MOCK_TODAY.hasCheckedOut ? 'text-neutral-900' : 'text-amber-600'}`}>
-                  {MOCK_TODAY.checkOutTime ?? 'Belum'}
+                <p className={`text-lg font-bold tabular-nums mt-1 ${hasCheckedOut ? 'text-neutral-900' : 'text-amber-600'}`}>
+                  {checkOutTime ?? 'Belum'}
                 </p>
               </div>
             </div>
@@ -61,7 +69,7 @@ export function DashboardToday() {
         </div>
       </div>
 
-      <Link href="/location" className="sm:col-span-2 block group">
+      <Link href="/scan" className="sm:col-span-2 block group">
         <div className="rounded-2xl bg-primary-600 p-5 flex items-center justify-between hover:bg-primary-500 transition-colors shadow-[0_8px_24px_rgba(204,0,0,0.25)]">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
@@ -69,7 +77,7 @@ export function DashboardToday() {
             </div>
             <div>
               <p className="text-white font-bold">
-                {MOCK_TODAY.hasCheckedIn && !MOCK_TODAY.hasCheckedOut ? 'Absen Keluar' : 'Absen Masuk'}
+                {hasCheckedIn && !hasCheckedOut ? 'Absen Keluar' : 'Absen Masuk'}
               </p>
               <p className="text-white/75 text-sm mt-0.5">Tap untuk scan QR</p>
             </div>

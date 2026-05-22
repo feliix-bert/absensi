@@ -11,7 +11,8 @@ import {
   getInitials, formatDateShort, getInternshipProgress, getRemainingDays
 } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { signOut } from '@/actions/auth.actions';
 
 interface InfoRowProps {
   icon: React.ElementType;
@@ -35,16 +36,24 @@ function InfoRow({ icon: Icon, label, value, className }: InfoRowProps) {
 }
 
 export default function ProfilePage() {
-  const { logout } = useAuth();
-  const progress = getInternshipProgress(MOCK_USER.startDate, MOCK_USER.endDate);
-  const remaining = getRemainingDays(MOCK_USER.endDate);
+  const profile = useAuthStore((state) => state.profile);
+  const user = useAuthStore((state) => state.user);
 
-  const handleLogout = () => {
-    if (confirm('Yakin ingin keluar?')) {
-      logout();
-      window.location.href = '/login';
-    }
-  };
+  // Fallback to mock data for display if real profile isn't loaded yet
+  const displayData = profile ? {
+    name: profile.nama,
+    nim: profile.nim,
+    division: profile.divisi,
+    mentor: profile.pembimbing,
+    officeLocation: profile.offices?.nama || 'Unknown Location',
+    email: user?.email || '',
+    // Parse durations safely if possible, fallback to dummy dates
+    startDate: new Date().toISOString(), // Mocked for now
+    endDate: new Date().toISOString(),
+  } : MOCK_USER;
+
+  const progress = getInternshipProgress(displayData.startDate, displayData.endDate);
+  const remaining = getRemainingDays(displayData.endDate);
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
@@ -66,7 +75,7 @@ export default function ProfilePage() {
           {/* Avatar */}
           <div className="relative">
             <div className="w-20 h-20 rounded-2xl bg-primary-600/30 border-2 border-primary-500/40 flex items-center justify-center text-white text-2xl font-bold">
-              {getInitials(MOCK_USER.name)}
+              {getInitials(displayData.name)}
             </div>
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success-500 border-2 border-secondary-700 flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-white" />
@@ -74,10 +83,10 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-white leading-tight">{MOCK_USER.name}</h2>
-            <p className="text-secondary-300 text-body-sm mt-0.5">{MOCK_USER.nim}</p>
+            <h2 className="text-xl font-bold text-white leading-tight">{displayData.name}</h2>
+            <p className="text-secondary-300 text-body-sm mt-0.5">{displayData.nim}</p>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="badge badge-navy border border-white/10 text-xs">{MOCK_USER.division}</span>
+              <span className="badge badge-navy border border-white/10 text-xs">{displayData.division}</span>
               <span className="badge bg-success-600/20 text-success-400 text-xs">Aktif</span>
             </div>
           </div>
@@ -122,8 +131,8 @@ export default function ProfilePage() {
           />
         </div>
         <div className="flex justify-between text-[11px] text-neutral-400">
-          <span>Mulai: {formatDateShort(MOCK_USER.startDate)}</span>
-          <span>Selesai: {formatDateShort(MOCK_USER.endDate)}</span>
+          <span>Mulai: {formatDateShort(displayData.startDate)}</span>
+          <span>Selesai: {formatDateShort(displayData.endDate)}</span>
         </div>
       </motion.div>
 
@@ -137,17 +146,17 @@ export default function ProfilePage() {
         <h3 className="text-label-sm text-neutral-400 uppercase tracking-wide py-3 border-b border-neutral-100">
           Informasi Magang
         </h3>
-        <InfoRow icon={User} label="Nama Lengkap" value={MOCK_USER.name} />
-        <InfoRow icon={Hash} label="NIM / ID Magang" value={MOCK_USER.nim} />
-        <InfoRow icon={Briefcase} label="Divisi" value={MOCK_USER.division} />
-        <InfoRow icon={GraduationCap} label="Pembimbing" value={MOCK_USER.mentor} />
+        <InfoRow icon={User} label="Nama Lengkap" value={displayData.name} />
+        <InfoRow icon={Hash} label="NIM / ID Magang" value={displayData.nim} />
+        <InfoRow icon={Briefcase} label="Divisi" value={displayData.division} />
+        <InfoRow icon={GraduationCap} label="Pembimbing" value={displayData.mentor} />
         <InfoRow
           icon={Calendar}
           label="Periode Magang"
-          value={`${formatDateShort(MOCK_USER.startDate)} — ${formatDateShort(MOCK_USER.endDate)}`}
+          value={`${formatDateShort(displayData.startDate)} — ${formatDateShort(displayData.endDate)}`}
         />
-        <InfoRow icon={MapPin} label="Lokasi Kantor" value={MOCK_USER.officeLocation} />
-        <InfoRow icon={Mail} label="Email" value={MOCK_USER.email} />
+        <InfoRow icon={MapPin} label="Lokasi Kantor" value={displayData.officeLocation} />
+        <InfoRow icon={Mail} label="Email" value={displayData.email} />
       </motion.div>
 
       {/* ─── Settings Options ─── */}
@@ -183,13 +192,15 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <button
-          id="profile-logout"
-          onClick={handleLogout}
-          className="btn btn-danger btn-full btn-lg w-full"
-        >
-          <LogOut size={18} /> Keluar dari Akun
-        </button>
+        <form action={signOut}>
+          <button
+            id="profile-logout"
+            type="submit"
+            className="btn btn-danger btn-full btn-lg w-full"
+          >
+            <LogOut size={18} /> Keluar dari Akun
+          </button>
+        </form>
       </motion.div>
 
       {/* ─── Version ─── */}

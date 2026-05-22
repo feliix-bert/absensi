@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Calendar, MapPin, Clock, ChevronDown } from 'lucide-react';
-import { MOCK_STATS } from '@/lib/mock-data';
-import { useAttendance } from '@/hooks/useAttendance';
+import { useEffect, useMemo } from 'react';
+import { getAttendanceHistory } from '@/actions/attendance.actions';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { cn } from '@/lib/utils';
@@ -27,12 +27,45 @@ function formatMonthLabel(ym: string) {
 
 export default function HistoryPage() {
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('semua');
-  const { filterByStatus, availableMonths } = useAttendance();
-  const [activeMonth, setActiveMonth] = useState(availableMonths[0] ?? '2025-05');
+  
+  // Available months: current month and past 3 months
+  const availableMonths = useMemo(() => {
+    const months = [];
+    for (let i = 0; i < 4; i++) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    }
+    return months;
+  }, []);
+  
+  const [activeMonth, setActiveMonth] = useState(availableMonths[0]);
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filtered = filterByStatus(activeFilter).filter((r) =>
-    r.date.startsWith(activeMonth)
-  );
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true);
+      const data = await getAttendanceHistory(activeMonth);
+      setHistoryData(data);
+      setIsLoading(false);
+    }
+    load();
+  }, [activeMonth]);
+
+  const filtered = historyData.filter(r => {
+    if (activeFilter === 'semua') return true;
+    return r.status.toLowerCase() === activeFilter.toLowerCase();
+  });
+
+  // Calculate stats for the current month
+  const totalDays = 30; // approx
+  const attendedDays = historyData.filter(r => r.status === 'Hadir').length;
+  const lateDays = historyData.filter(r => r.status === 'Terlambat').length;
+  const izinDays = historyData.filter(r => r.status === 'Izin' || r.status === 'Sakit').length;
+  const alphaDays = historyData.filter(r => r.status === 'Alpha' || r.status === 'Absen').length;
+  const totalRelevant = attendedDays + lateDays + alphaDays;
+  const attendanceRate = totalRelevant === 0 ? 100 : Math.round(((attendedDays + lateDays) / totalRelevant) * 100);
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
@@ -48,7 +81,7 @@ export default function HistoryPage() {
           <div>
             <p className="text-secondary-300 text-body-sm">{formatMonthLabel(activeMonth)}</p>
             <p className="text-2xl font-bold mt-0.5">
-              {MOCK_STATS.attendedDays} <span className="text-secondary-300 text-lg font-normal">/ {MOCK_STATS.totalDays} hari</span>
+              {attendedDays} <span className="text-secondary-300 text-lg font-normal">/ {totalDays} hari</span>
             </p>
           </div>
           <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -58,17 +91,17 @@ export default function HistoryPage() {
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${MOCK_STATS.attendanceRate}%` }}
+            animate={{ width: `${attendanceRate}%` }}
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
             className="h-full bg-primary-500 rounded-full"
           />
         </div>
         <div className="grid grid-cols-4 gap-2 mt-4">
           {[
-            { label: 'Hadir', value: MOCK_STATS.attendedDays, color: 'text-success-400' },
-            { label: 'Telat', value: MOCK_STATS.lateDays, color: 'text-warning-400' },
-            { label: 'Izin', value: MOCK_STATS.izinDays, color: 'text-blue-400' },
-            { label: 'Alpha', value: MOCK_STATS.alphaDays, color: 'text-danger-400' },
+            { label: 'Hadir', value: attendedDays, color: 'text-success-400' },
+            { label: 'Telat', value: lateDays, color: 'text-warning-400' },
+            { label: 'Izin', value: izinDays, color: 'text-blue-400' },
+            { label: 'Alpha', value: alphaDays, color: 'text-danger-400' },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
@@ -127,16 +160,20 @@ export default function HistoryPage() {
         ))}
       </motion.div>
 
-      {/* ─── History List ─── */}
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center py-10 text-neutral-400">Memuat...</div>
+      ) : filtered.length === 0 ? (
         <EmptyState variant="history" />
       ) : (
         <div className="space-y-2.5">
           {filtered.map((record, i) => {
-            const date = new Date(record.date);
+            const date = new Date(record.check_in);
             const dayName = date.toLocaleDateString('id-ID', { weekday: 'short' });
             const dayNum = date.getDate();
             const monthName = date.toLocaleDateString('id-ID', { month: 'short' });
+            
+            const checkInTime = new Date(record.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const checkOutTime = record.check_out ? new Date(record.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
 
             return (
               <motion.div
@@ -168,16 +205,16 @@ export default function HistoryPage() {
                       )}
                     </div>
 
-                    {record.checkIn ? (
+                    {record.check_in ? (
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center gap-1.5">
                           <Clock size={12} className="text-success-500" />
-                          <span className="text-body-sm text-neutral-700 font-medium">Masuk: {record.checkIn}</span>
+                          <span className="text-body-sm text-neutral-700 font-medium">Masuk: {checkInTime}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock size={12} className="text-neutral-400" />
                           <span className="text-body-sm text-neutral-500">
-                            Keluar: {record.checkOut ?? '—'}
+                            Keluar: {checkOutTime ?? '—'}
                           </span>
                         </div>
                       </div>

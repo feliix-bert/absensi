@@ -1,22 +1,20 @@
 'use client';
 
 import { CheckCircle2, Flame, Calendar } from 'lucide-react';
-import { MOCK_STATS } from '@/lib/mock-data';
 import { getRemainingDays } from '@/lib/utils';
-import { MOCK_USER } from '@/lib/mock-data';
 
-const STATS = (remaining: number) => [
+const STATS = (remaining: number, stats: any) => [
   {
     icon: CheckCircle2,
     label: 'Hadir',
-    value: MOCK_STATS.attendedDays,
-    sub: `dari ${MOCK_STATS.totalDays} hari`,
+    value: stats?.attendedDays || 0,
+    sub: `dari ${stats?.totalDays || 30} hari`,
     iconBg: 'bg-emerald-50 text-emerald-600',
   },
   {
     icon: Flame,
     label: 'Streak',
-    value: MOCK_STATS.streakDays,
+    value: stats?.streakDays || 0,
     sub: 'hari berturut',
     iconBg: 'bg-amber-50 text-amber-600',
   },
@@ -29,12 +27,19 @@ const STATS = (remaining: number) => [
   },
 ];
 
-export function DashboardStatCards() {
-  const remaining = getRemainingDays(MOCK_USER.endDate);
+interface DashboardStatCardsProps {
+  stats: any
+  profile: any
+}
+
+export function DashboardStatCards({ stats, profile }: DashboardStatCardsProps) {
+  // Try to calculate remaining days based on profile's durasi_magang or fallback to 90
+  const endDate = profile?.created_at ? new Date(new Date(profile.created_at).getTime() + 90 * 24 * 60 * 60 * 1000) : new Date();
+  const remaining = getRemainingDays(endDate.toISOString());
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      {STATS(remaining).map((s) => (
+      {STATS(remaining, stats).map((s) => (
         <div key={s.label} className="card-modern p-4">
           <div className={`w-9 h-9 rounded-xl ${s.iconBg} flex items-center justify-center mb-3`}>
             <s.icon size={18} />

@@ -1,24 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, LogIn, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
+import { signIn } from '@/actions/auth.actions';
 import { AuthPromoPanel } from '@/components/auth/AuthPromoPanel';
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', rememberMe: false });
-  const { login, isLoading, error, clearError } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    const ok = await login(form);
-    if (ok) window.location.href = '/dashboard';
-  };
+  const [state, formAction, isPending] = useActionState(signIn, null);
 
   return (
     <div className="min-h-dvh bg-neutral-50 flex flex-col">
@@ -53,18 +45,18 @@ export default function LoginPage() {
             </div>
 
             {/* Error Alert */}
-            {error && (
+            {state?.error && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex items-center gap-3 p-3.5 rounded-lg bg-danger-50 border border-danger-100 mb-5"
               >
                 <AlertCircle size={16} className="text-danger-500 flex-shrink-0" />
-                <p className="text-body-sm text-danger-700">{error}</p>
+                <p className="text-body-sm text-danger-700">{state.error}</p>
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            <form action={formAction} className="space-y-5" noValidate>
               {/* Email */}
               <div>
                 <label htmlFor="login-email" className="form-label">
@@ -72,13 +64,12 @@ export default function LoginPage() {
                 </label>
                 <input
                   id="login-email"
+                  name="email"
                   type="email"
                   autoComplete="email"
                   placeholder="nama@intern.telkom.co.id"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className={cn('input', error && !form.email && 'input-error')}
-                  disabled={isLoading}
+                  className={cn('input', state?.error && 'input-error')}
+                  disabled={isPending}
                 />
               </div>
 
@@ -90,13 +81,12 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     id="login-password"
+                    name="password"
                     type={showPass ? 'text' : 'password'}
                     autoComplete="current-password"
                     placeholder="Masukkan password"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className={cn('input pr-11', error && !form.password && 'input-error')}
-                    disabled={isLoading}
+                    className={cn('input pr-11', state?.error && 'input-error')}
+                    disabled={isPending}
                   />
                   <button
                     type="button"
@@ -114,9 +104,8 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     id="remember-me"
+                    name="rememberMe"
                     type="checkbox"
-                    checked={form.rememberMe}
-                    onChange={(e) => setForm({ ...form, rememberMe: e.target.checked })}
                     className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   />
                   <span className="text-body-sm text-neutral-600">Ingat saya</span>
@@ -133,10 +122,10 @@ export default function LoginPage() {
               <button
                 id="login-submit"
                 type="submit"
-                disabled={isLoading}
+                disabled={isPending}
                 className="btn btn-primary btn-full btn-lg mt-2 relative"
               >
-                {isLoading ? (
+                {isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Memverifikasi...

@@ -9,6 +9,8 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { ScanResult } from '@/lib/types';
+import { QRScannerComponent } from '@/components/shared/QRScannerComponent';
+import { submitCheckIn } from '@/actions/attendance.actions';
 
 type DemoScan = ScanResult;
 
@@ -151,12 +153,53 @@ function ErrorOverlay({ type, onRetry }: { type: 'invalid' | 'expired'; onRetry:
 export default function ScanPage() {
   const [scanState, setScanState] = useState<DemoScan>('scanning');
   const [torchOn, setTorchOn] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleDemoChange = (state: DemoScan) => {
-    setScanState(state);
+  const handleScanSuccess = (token: string) => {
+    if (isProcessing || scanState !== 'scanning') return;
+    setIsProcessing(true);
+
+    if (!navigator.geolocation) {
+      setErrorMsg('Geolocation tidak didukung oleh browser Anda.');
+      setScanState('invalid');
+      setIsProcessing(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        
+        const res = await submitCheckIn({
+          latitude,
+          longitude,
+          accuracy,
+          qrToken: token
+        });
+
+        if (res.error) {
+          setErrorMsg(res.error);
+          setScanState('invalid');
+        } else {
+          setScanState('success');
+        }
+        setIsProcessing(false);
+      },
+      (err) => {
+        setErrorMsg('Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.');
+        setScanState('invalid');
+        setIsProcessing(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
-  const isResult = scanState !== 'scanning';
+  const handleRetry = () => {
+    setScanState('scanning');
+    setErrorMsg('');
+  };
+
 
   return (
     <div className="min-h-dvh bg-neutral-900 flex flex-col">
@@ -181,23 +224,7 @@ export default function ScanPage() {
         </button>
       </header>
 
-      {/* ─── Demo switcher ─── */}
-      <div className="relative z-20 px-4 py-2">
-        <div className="flex gap-2 justify-center flex-wrap">
-          {DEMO_STATES.map((s) => (
-            <button
-              key={s.key}
-              onClick={() => handleDemoChange(s.key)}
-              className={cn(
-                'px-3 py-1 rounded-full text-[11px] font-medium transition-colors',
-                scanState === s.key ? 'bg-primary-600 text-white' : 'bg-white/10 text-white/60 hover:bg-white/20'
-              )}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       {/* ─── Scanner Area ─── */}
       <div className="flex-1 flex flex-col items-center justify-center relative">
@@ -212,15 +239,22 @@ export default function ScanPage() {
         </div>
 
         {/* Scanner */}
-        <div className="relative z-10">
-          <ScanFrame active={scanState === 'scanning'} />
+        <div className="relative z-10 w-full max-w-sm mx-auto">
+          {scanState === 'scanning' && (
+             <div className="relative">
+               <QRScannerComponent onScanSuccess={handleScanSuccess} torchOn={torchOn} />
+               <div className="absolute inset-0 pointer-events-none">
+                 <ScanFrame active={true} />
+               </div>
+             </div>
+          )}
         </div>
 
         {/* Result overlays */}
         <AnimatePresence>
-          {scanState === 'success' && <SuccessOverlay onDone={() => setScanState('scanning')} />}
+          {scanState === 'success' && <SuccessOverlay onDone={handleRetry} />}
           {(scanState === 'invalid' || scanState === 'expired') && (
-            <ErrorOverlay type={scanState} onRetry={() => setScanState('scanning')} />
+            <ErrorOverlay type={scanState} onRetry={handleRetry} />
           )}
         </AnimatePresence>
       </div>
@@ -234,9 +268,11 @@ export default function ScanPage() {
         >
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 text-center border border-white/10">
             <Info size={16} className="text-white/60 mx-auto mb-2" />
-            <h3 className="text-white font-semibold mb-1">Arahkan kamera ke QR Code</h3>
+            <h3 className="text-white font-semibold mb-1">
+              {isProcessing ? 'Memverifikasi Lokasi...' : 'Arahkan kamera ke QR Code'}
+            </h3>
             <p className="text-white/60 text-body-sm">
-              QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.
+              {errorMsg || 'QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.'}
             </p>
             <div className="mt-3 flex items-center justify-center gap-2">
               <span className="status-dot bg-success-500 animate-pulse" />

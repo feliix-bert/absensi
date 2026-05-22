@@ -1,12 +1,13 @@
 'use client';
 
-import { MOCK_USER } from '@/lib/mock-data';
 import { formatDate, getGreeting } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { Avatar } from '@/components/shared/Avatar';
 
 export function DashboardGreeting() {
+  const profile = useAuthStore(state => state.profile);
   const today = new Date().toISOString().split('T')[0];
-  const firstName = MOCK_USER.name.split(' ')[0];
+  const firstName = profile?.nama?.split(' ')[0] || 'User';
 
   return (
     <section className="card-modern p-5 md:p-6 flex items-center justify-between gap-4 border-l-4 border-l-primary-600">
@@ -19,10 +20,10 @@ export function DashboardGreeting() {
           {formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
         <span className="inline-block mt-3 text-xs font-medium text-secondary-700 bg-secondary-50 px-3 py-1 rounded-full">
-          {MOCK_USER.division}
+          {profile?.divisi || 'Divisi'}
         </span>
       </div>
-      <Avatar name={MOCK_USER.name} size="xl" className="ring-4 ring-primary-50 shrink-0" />
+      <Avatar name={profile?.nama || 'User'} size="xl" className="ring-4 ring-primary-50 shrink-0" />
     </section>
   );
 }

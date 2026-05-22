@@ -1,12 +1,19 @@
 'use client';
 
-import { MOCK_USER, MOCK_STATS } from '@/lib/mock-data';
 import { getInternshipProgress } from '@/lib/utils';
 
-export function DashboardProgress() {
-  const progress = getInternshipProgress(MOCK_USER.startDate, MOCK_USER.endDate);
-  const start = new Date(MOCK_USER.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-  const end = new Date(MOCK_USER.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+interface DashboardProgressProps {
+  stats: any
+  profile: any
+}
+
+export function DashboardProgress({ stats, profile }: DashboardProgressProps) {
+  const startDate = profile?.created_at || new Date().toISOString()
+  const endDate = new Date(new Date(startDate).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
+  
+  const progress = getInternshipProgress(startDate, endDate);
+  const start = new Date(startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  const end = new Date(endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
   return (
     <div className="card-modern p-5 md:p-6">
@@ -32,12 +39,12 @@ export function DashboardProgress() {
           <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide mb-1">
             Tingkat kehadiran
           </p>
-          <p className="text-3xl font-bold text-emerald-600 tabular-nums">{MOCK_STATS.attendanceRate}%</p>
+          <p className="text-3xl font-bold text-emerald-600 tabular-nums">{stats?.attendanceRate || 0}%</p>
           <div className="flex gap-4 mt-3 text-center">
             {[
-              { l: 'Hadir', v: MOCK_STATS.attendedDays, c: 'text-emerald-600' },
-              { l: 'Izin', v: MOCK_STATS.izinDays, c: 'text-primary-600' },
-              { l: 'Alpha', v: MOCK_STATS.alphaDays, c: 'text-red-500' },
+              { l: 'Hadir', v: stats?.attendedDays || 0, c: 'text-emerald-600' },
+              { l: 'Izin', v: stats?.izinDays || 0, c: 'text-primary-600' },
+              { l: 'Alpha', v: stats?.alphaDays || 0, c: 'text-red-500' },
             ].map((x) => (
               <div key={x.l}>
                 <p className={`text-sm font-bold ${x.c}`}>{x.v}</p>

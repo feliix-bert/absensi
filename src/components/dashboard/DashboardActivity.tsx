@@ -2,11 +2,15 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { MOCK_ATTENDANCE_HISTORY } from '@/lib/mock-data';
+
 import { StatusBadge } from '@/components/shared/StatusBadge';
 
-export function DashboardActivity() {
-  const items = MOCK_ATTENDANCE_HISTORY.slice(0, 5);
+interface DashboardActivityProps {
+  recentActivity: any[]
+}
+
+export function DashboardActivity({ recentActivity = [] }: DashboardActivityProps) {
+  const items = recentActivity;
 
   return (
     <section>
@@ -21,7 +25,7 @@ export function DashboardActivity() {
       </div>
       <div className="card-modern divide-y divide-neutral-100 overflow-hidden">
         {items.map((record) => {
-          const d = new Date(record.date);
+          const d = new Date(record.id);
           return (
             <div key={record.id} className="flex items-center gap-4 p-4 hover:bg-neutral-50/80 transition-colors">
               <div className="w-11 text-center shrink-0">
@@ -40,16 +44,11 @@ export function DashboardActivity() {
                   )}
                 </div>
                 <p className="text-sm text-neutral-500 mt-0.5 truncate">
-                  {record.checkIn
-                    ? `${record.checkIn} – ${record.checkOut ?? 'belum keluar'}`
-                    : record.notes ?? '—'}
+                  {record.time
+                    ? `${record.time}`
+                    : '—'}
                 </p>
               </div>
-              {record.duration && (
-                <span className="text-xs font-medium text-neutral-400 shrink-0 tabular-nums">
-                  {record.duration}
-                </span>
-              )}
             </div>
           );
         })}

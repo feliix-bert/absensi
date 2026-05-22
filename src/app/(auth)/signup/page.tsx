@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, ChevronRight, ChevronLeft, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DIVISIONS } from '@/lib/constants';
 import { AuthPromoPanel } from '@/components/auth/AuthPromoPanel';
+import { signUp } from '@/actions/auth.actions';
+import { createClient } from '@/utils/supabase/client';
 
 type Step = 1 | 2;
 
@@ -54,13 +56,38 @@ function PasswordStrength({ password }: { password: string }) {
   );
 }
 
+const Field = ({
+  id, label, error, children
+}: { id: string; label: string; error?: string; children: React.ReactNode }) => (
+  <div>
+    <label htmlFor={id} className="form-label">{label}</label>
+    {children}
+    {error && (
+      <p className="form-error flex items-center gap-1 mt-1">
+        <AlertCircle size={12} /> {error}
+      </p>
+    )}
+  </div>
+);
+
 export default function SignupPage() {
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [loading, setLoading] = useState(false);
+  const [offices, setOffices] = useState<any[]>([]);
+  
+  const [state, formAction, isPending] = useActionState(signUp, null);
+
+  useEffect(() => {
+    const fetchOffices = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from('offices').select('id, nama');
+      if (data) setOffices(data);
+    };
+    fetchOffices();
+  }, []);
 
   const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -93,27 +120,7 @@ export default function SignupPage() {
     if (validateStep1()) setStep(2);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateStep2()) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1800));
-    window.location.href = '/dashboard';
-  };
 
-  const Field = ({
-    id, label, error, children
-  }: { id: string; label: string; error?: string; children: React.ReactNode }) => (
-    <div>
-      <label htmlFor={id} className="form-label">{label}</label>
-      {children}
-      {error && (
-        <p className="form-error flex items-center gap-1">
-          <AlertCircle size={12} /> {error}
-        </p>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-dvh bg-neutral-50 flex flex-col">
@@ -206,30 +213,42 @@ export default function SignupPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.25 }}
-                  onSubmit={handleSubmit}
+                  action={formAction}
                   className="space-y-4"
                   noValidate
                 >
+                  {state?.error && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-danger-50 border border-danger-100 mb-2">
+                      <AlertCircle size={14} className="text-danger-500" />
+                      <p className="text-body-sm text-danger-700">{state.error}</p>
+                    </div>
+                  )}
+                  {/* Hidden inputs for Step 1 data */}
+                  <input type="hidden" name="nama" value={form.name} />
+                  <input type="hidden" name="nim" value={form.nim} />
+                  <input type="hidden" name="divisi" value={form.division} />
+                  <input type="hidden" name="pembimbing" value={form.mentor} />
+                  
                   <div className="grid grid-cols-2 gap-3">
-                    <Field id="signup-startdate" label="Mulai Magang" error={errors.startDate}>
-                      <input id="signup-startdate" type="date" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
-                    </Field>
-                    <Field id="signup-enddate" label="Selesai Magang" error={errors.endDate}>
-                      <input id="signup-enddate" type="date" value={form.endDate} onChange={set('endDate')} className={cn('input', errors.endDate && 'input-error')} />
+                    <Field id="signup-startdate" label="Durasi Magang" error={errors.startDate}>
+                      <input id="signup-startdate" name="durasi_magang" type="text" placeholder="Misal: 3 Bulan" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
                     </Field>
                   </div>
 
-                  <Field id="signup-office" label="Nama Lokasi Kantor" error={errors.officeLocation}>
-                    <input id="signup-office" type="text" placeholder="Contoh: Graha Merah Putih, Jakarta" value={form.officeLocation} onChange={set('officeLocation')} className={cn('input', errors.officeLocation && 'input-error')} />
+                  <Field id="signup-office" label="Lokasi Kantor" error={errors.officeLocation}>
+                    <select id="signup-office" name="lokasi_kantor" value={form.officeLocation} onChange={set('officeLocation')} className={cn('input', errors.officeLocation && 'input-error')}>
+                      <option value="">Pilih lokasi kantor...</option>
+                      {offices.map(o => <option key={o.id} value={o.id}>{o.nama}</option>)}
+                    </select>
                   </Field>
 
                   <Field id="signup-email" label="Email" error={errors.email}>
-                    <input id="signup-email" type="email" autoComplete="email" placeholder="email@intern.telkom.co.id" value={form.email} onChange={set('email')} className={cn('input', errors.email && 'input-error')} />
+                    <input id="signup-email" name="email" type="email" autoComplete="email" placeholder="email@intern.telkom.co.id" value={form.email} onChange={set('email')} className={cn('input', errors.email && 'input-error')} />
                   </Field>
 
                   <Field id="signup-password" label="Password" error={errors.password}>
                     <div className="relative">
-                      <input id="signup-password" type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Minimal 8 karakter" value={form.password} onChange={set('password')} className={cn('input pr-11', errors.password && 'input-error')} />
+                      <input id="signup-password" name="password" type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Minimal 8 karakter" value={form.password} onChange={set('password')} className={cn('input pr-11', errors.password && 'input-error')} />
                       <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1">
                         {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -250,8 +269,8 @@ export default function SignupPage() {
                     <button type="button" onClick={() => setStep(1)} className="btn btn-outline btn-lg flex-1">
                       <ChevronLeft size={18} /> Kembali
                     </button>
-                    <button id="signup-submit" type="submit" disabled={loading} className="btn btn-primary btn-lg flex-2 flex-1">
-                      {loading ? (
+                    <button id="signup-submit" type="submit" disabled={isPending} className="btn btn-primary btn-lg flex-2 flex-1">
+                      {isPending ? (
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Mendaftar...
