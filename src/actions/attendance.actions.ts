@@ -22,8 +22,9 @@ export async function submitCheckIn(payload: AttendancePayload) {
   }
 
   // 2. Validate QR Token
-  if (!validateStaticQR(payload.qrToken)) {
-    return { error: 'QR Code tidak valid atau kadaluarsa' }
+  const qrValidation = validateStaticQR(payload.qrToken)
+  if (!qrValidation.isValid) {
+    return { error: qrValidation.reason || 'QR Code tidak valid atau kadaluarsa' }
   }
 
   // 3. Fetch Profile and Office Location
