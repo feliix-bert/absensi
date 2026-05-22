@@ -35,7 +35,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
     .single()
 
   if (profileError || !profile || !profile.offices) {
-    return { error: 'Data lokasi kantor tidak ditemukan untuk pengguna ini' }
+    return { error: 'Lokasi kantor belum disetting untuk profil Anda. Harap hubungi admin.' }
   }
 
   // @ts-ignore - Supabase type inference for joined tables can be tricky sometimes

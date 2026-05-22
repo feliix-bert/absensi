@@ -11,7 +11,6 @@ const signUpSchema = z.object({
   divisi: z.string().min(2, 'Divisi minimal 2 karakter'),
   pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
   durasi_magang: z.string().min(1, 'Durasi magang harus diisi'),
-  lokasi_kantor: z.string().uuid('Pilih lokasi kantor yang valid'),
   email: z.string().email('Email tidak valid'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
 })

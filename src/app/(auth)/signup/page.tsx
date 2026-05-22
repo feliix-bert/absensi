@@ -14,13 +14,13 @@ type Step = 1 | 2;
 
 interface FormData {
   name: string; nim: string; division: string; mentor: string;
-  startDate: string; endDate: string; officeLocation: string;
+  startDate: string; endDate: string;
   email: string; password: string; confirmPassword: string;
 }
 
 const EMPTY_FORM: FormData = {
   name: '', nim: '', division: '', mentor: '',
-  startDate: '', endDate: '', officeLocation: '',
+  startDate: '', endDate: '',
   email: '', password: '', confirmPassword: '',
 };
 
@@ -76,18 +76,8 @@ export default function SignupPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [offices, setOffices] = useState<any[]>([]);
   
   const [state, formAction, isPending] = useActionState(signUp, null);
-
-  useEffect(() => {
-    const fetchOffices = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from('offices').select('id, nama');
-      if (data) setOffices(data);
-    };
-    fetchOffices();
-  }, []);
 
   const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -108,7 +98,6 @@ export default function SignupPage() {
     const errs: Partial<FormData> = {};
     if (!form.startDate) errs.startDate = 'Tanggal mulai wajib diisi';
     if (!form.endDate) errs.endDate = 'Tanggal selesai wajib diisi';
-    if (!form.officeLocation.trim()) errs.officeLocation = 'Nama lokasi kantor wajib diisi';
     if (!form.email.includes('@')) errs.email = 'Email tidak valid';
     if (form.password.length < 8) errs.password = 'Password minimal 8 karakter';
     if (form.password !== form.confirmPassword) errs.confirmPassword = 'Password tidak cocok';
@@ -234,13 +223,6 @@ export default function SignupPage() {
                       <input id="signup-startdate" name="durasi_magang" type="text" placeholder="Misal: 3 Bulan" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
                     </Field>
                   </div>
-
-                  <Field id="signup-office" label="Lokasi Kantor" error={errors.officeLocation}>
-                    <select id="signup-office" name="lokasi_kantor" value={form.officeLocation} onChange={set('officeLocation')} className={cn('input', errors.officeLocation && 'input-error')}>
-                      <option value="">Pilih lokasi kantor...</option>
-                      {offices.map(o => <option key={o.id} value={o.id}>{o.nama}</option>)}
-                    </select>
-                  </Field>
 
                   <Field id="signup-email" label="Email" error={errors.email}>
                     <input id="signup-email" name="email" type="email" autoComplete="email" placeholder="email@intern.telkom.co.id" value={form.email} onChange={set('email')} className={cn('input', errors.email && 'input-error')} />
