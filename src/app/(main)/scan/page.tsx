@@ -103,7 +103,7 @@ function SuccessOverlay({ onDone }: { onDone: () => void }) {
 }
 
 // ─── Error Overlay ────────────────────────────
-function ErrorOverlay({ type, onRetry }: { type: 'invalid' | 'expired'; onRetry: () => void }) {
+function ErrorOverlay({ type, message, onRetry }: { type: 'invalid' | 'expired'; message?: string; onRetry: () => void }) {
   const isInvalid = type === 'invalid';
   return (
     <motion.div
@@ -127,10 +127,10 @@ function ErrorOverlay({ type, onRetry }: { type: 'invalid' | 'expired'; onRetry:
           {isInvalid ? 'QR Code Tidak Valid' : 'QR Code Kadaluarsa'}
         </h2>
         <p className="text-neutral-300 text-body-md mb-6">
-          {isInvalid
+          {message || (isInvalid
             ? 'QR code tidak dikenali. Pastikan kamu scan QR yang benar.'
             : 'QR code sudah habis masa berlakunya. Minta QR code baru dari admin/sistem.'
-          }
+          )}
         </p>
         <div className="space-y-3 w-64">
           <button onClick={onRetry} className="btn btn-primary btn-full btn-lg">
@@ -292,7 +292,7 @@ export default function ScanPage() {
         <AnimatePresence>
           {scanStep === 'success' && <SuccessOverlay onDone={handleRetry} />}
           {(scanStep === 'invalid' || scanStep === 'expired') && (
-            <ErrorOverlay type={scanStep} onRetry={handleRetry} />
+            <ErrorOverlay type={scanStep} message={errorMsg} onRetry={handleRetry} />
           )}
         </AnimatePresence>
       </div>
