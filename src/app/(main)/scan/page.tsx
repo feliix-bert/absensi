@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, CheckCircle2, XCircle, Clock,
@@ -12,14 +12,9 @@ import type { ScanResult } from '@/lib/types';
 import { QRScannerComponent } from '@/components/shared/QRScannerComponent';
 import { submitCheckIn } from '@/actions/attendance.actions';
 
-type DemoScan = ScanResult;
+type ScanStep = 'requesting_location' | 'scanning' | 'processing' | 'success' | 'invalid' | 'expired';
 
-const DEMO_STATES: { key: DemoScan; label: string }[] = [
-  { key: 'scanning', label: 'Scanning' },
-  { key: 'success', label: 'Sukses' },
-  { key: 'invalid', label: 'Tidak Valid' },
-  { key: 'expired', label: 'Kadaluarsa' },
-];
+
 
 // ─── Scanner Frame ───────────────────────────
 function ScanFrame({ active }: { active: boolean }) {
@@ -151,52 +146,65 @@ function ErrorOverlay({ type, onRetry }: { type: 'invalid' | 'expired'; onRetry:
 }
 
 export default function ScanPage() {
-  const [scanState, setScanState] = useState<DemoScan>('scanning');
+  const [scanStep, setScanStep] = useState<ScanStep>('requesting_location');
+  const [location, setLocation] = useState<{ lat: number; lng: number; acc: number } | null>(null);
   const [torchOn, setTorchOn] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleScanSuccess = (token: string) => {
-    if (isProcessing || scanState !== 'scanning') return;
-    setIsProcessing(true);
+  // 1. Request location on mount
+  useEffect(() => {
+    if (scanStep !== 'requesting_location') return;
 
     if (!navigator.geolocation) {
       setErrorMsg('Geolocation tidak didukung oleh browser Anda.');
-      setScanState('invalid');
-      setIsProcessing(false);
+      setScanStep('invalid');
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        
-        const res = await submitCheckIn({
-          latitude,
-          longitude,
-          accuracy,
-          qrToken: token
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          acc: position.coords.accuracy,
         });
-
-        if (res.error) {
-          setErrorMsg(res.error);
-          setScanState('invalid');
-        } else {
-          setScanState('success');
-        }
-        setIsProcessing(false);
+        setScanStep('scanning'); // Location granted, move to scanning
       },
       (err) => {
-        setErrorMsg('Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.');
-        setScanState('invalid');
-        setIsProcessing(false);
+        setErrorMsg('Izin lokasi ditolak atau gagal. Tolong izinkan akses lokasi untuk bisa absen.');
+        setScanStep('invalid');
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
+  }, [scanStep]);
+
+  // 2. Handle scan success
+  const handleScanSuccess = async (token: string) => {
+    if (scanStep !== 'scanning' || !location) return;
+    setScanStep('processing');
+
+    const res = await submitCheckIn({
+      latitude: location.lat,
+      longitude: location.lng,
+      accuracy: location.acc,
+      qrToken: token.trim() // Just in case there's whitespace
+    });
+
+    if (res.error) {
+      setErrorMsg(res.error);
+      setScanStep('invalid');
+    } else {
+      setScanStep('success');
+    }
   };
 
   const handleRetry = () => {
-    setScanState('scanning');
+    // If we have location, we can just scan again
+    if (location) {
+      setScanStep('scanning');
+    } else {
+      setScanStep('requesting_location');
+    }
     setErrorMsg('');
   };
 
@@ -240,7 +248,14 @@ export default function ScanPage() {
 
         {/* Scanner */}
         <div className="relative z-10 w-full max-w-sm mx-auto">
-          {scanState === 'scanning' && (
+          {scanStep === 'requesting_location' && (
+            <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-white/20 rounded-2xl">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mb-4"></div>
+              <p className="text-white/80 text-sm">Mendapatkan lokasi Anda...</p>
+            </div>
+          )}
+
+          {scanStep === 'scanning' && (
              <div className="relative">
                <QRScannerComponent onScanSuccess={handleScanSuccess} torchOn={torchOn} />
                <div className="absolute inset-0 pointer-events-none">
@@ -248,19 +263,26 @@ export default function ScanPage() {
                </div>
              </div>
           )}
+          
+          {scanStep === 'processing' && (
+            <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-white/20 rounded-2xl bg-black/50">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mb-4"></div>
+              <p className="text-white font-medium">Memverifikasi absen...</p>
+            </div>
+          )}
         </div>
 
         {/* Result overlays */}
         <AnimatePresence>
-          {scanState === 'success' && <SuccessOverlay onDone={handleRetry} />}
-          {(scanState === 'invalid' || scanState === 'expired') && (
-            <ErrorOverlay type={scanState} onRetry={handleRetry} />
+          {scanStep === 'success' && <SuccessOverlay onDone={handleRetry} />}
+          {(scanStep === 'invalid' || scanStep === 'expired') && (
+            <ErrorOverlay type={scanStep} onRetry={handleRetry} />
           )}
         </AnimatePresence>
       </div>
 
       {/* ─── Bottom Instruction Panel ─── */}
-      {scanState === 'scanning' && (
+      {(scanStep === 'requesting_location' || scanStep === 'scanning' || scanStep === 'processing') && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -269,14 +291,19 @@ export default function ScanPage() {
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 text-center border border-white/10">
             <Info size={16} className="text-white/60 mx-auto mb-2" />
             <h3 className="text-white font-semibold mb-1">
-              {isProcessing ? 'Memverifikasi Lokasi...' : 'Arahkan kamera ke QR Code'}
+              {scanStep === 'requesting_location' ? 'Izin Lokasi Diperlukan' :
+               scanStep === 'processing' ? 'Mengecek...' : 'Arahkan kamera ke QR Code'}
             </h3>
             <p className="text-white/60 text-body-sm">
               {errorMsg || 'QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.'}
             </p>
             <div className="mt-3 flex items-center justify-center gap-2">
-              <span className="status-dot bg-success-500 animate-pulse" />
-              <span className="text-white/70 text-[11px]">Lokasi terverifikasi · GPS aktif</span>
+              {scanStep === 'scanning' && (
+                <>
+                  <span className="status-dot bg-success-500 animate-pulse" />
+                  <span className="text-white/70 text-[11px]">Lokasi terverifikasi · GPS aktif</span>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

@@ -6,5 +6,8 @@ export function validateStaticQR(scannedToken: string): boolean {
     return false
   }
 
-  return scannedToken === expectedToken
+  const cleanExpected = expectedToken.trim().replace(/^["']|["']$/g, '');
+  const cleanScanned = scannedToken.trim().replace(/^["']|["']$/g, '');
+
+  return cleanScanned === cleanExpected
 }
