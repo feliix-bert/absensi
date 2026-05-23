@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { cn } from '@/lib/utils';
 import type { AttendanceStatus } from '@/lib/types';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 type FilterStatus = 'semua' | AttendanceStatus;
 
@@ -27,23 +28,46 @@ function formatMonthLabel(ym: string) {
 
 export default function HistoryPage() {
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('semua');
-  
-  // Available months: current month and past 3 months
+  const profile = useAuthStore(state => state.profile);
+
   const availableMonths = useMemo(() => {
     const months = [];
-    for (let i = 0; i < 4; i++) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    if (profile?.mulai_magang && profile?.selesai_magang) {
+      const start = new Date(profile.mulai_magang);
+      const end = new Date(profile.selesai_magang);
+      let curr = new Date(start.getFullYear(), start.getMonth(), 1);
+      const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+      
+      while (curr <= endMonth) {
+        months.push(`${curr.getFullYear()}-${String(curr.getMonth() + 1).padStart(2, '0')}`);
+        curr.setMonth(curr.getMonth() + 1);
+      }
+      // Ensure current month is always present if it's not empty, or reverse it so newest is first
+      months.reverse();
+    }
+    
+    if (months.length === 0) {
+      for (let i = 0; i < 4; i++) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+      }
     }
     return months;
-  }, []);
+  }, [profile]);
   
-  const [activeMonth, setActiveMonth] = useState(availableMonths[0]);
+  const [activeMonth, setActiveMonth] = useState('');
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (availableMonths.length > 0 && !activeMonth) {
+      setActiveMonth(availableMonths[0]);
+    }
+  }, [availableMonths, activeMonth]);
+
+  useEffect(() => {
+    if (!activeMonth) return;
     async function load() {
       setIsLoading(true);
       const data = await getAttendanceHistory(activeMonth);
@@ -79,7 +103,7 @@ export default function HistoryPage() {
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-secondary-300 text-body-sm">{formatMonthLabel(activeMonth)}</p>
+            <p className="text-secondary-300 text-body-sm">{activeMonth ? formatMonthLabel(activeMonth) : 'Memuat...'}</p>
             <p className="text-2xl font-bold mt-0.5">
               {attendedDays} <span className="text-secondary-300 text-lg font-normal">/ {totalDays} hari</span>
             </p>

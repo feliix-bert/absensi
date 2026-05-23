@@ -45,8 +45,28 @@ export function QRScannerComponent({ onScanSuccess, onScanError, torchOn }: QRSc
       if (codeReader.current) {
         codeReader.current.reset();
       }
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
     };
   }, [onScanSuccess, onScanError]);
+
+  // Handle Torch
+  useEffect(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        const capabilities = track.getCapabilities();
+        if ((capabilities as any).torch) {
+          track.applyConstraints({
+            advanced: [{ torch: torchOn }] as any
+          }).catch(console.error);
+        }
+      }
+    }
+  }, [torchOn]);
 
   return (
     <div className="relative w-full max-w-sm mx-auto overflow-hidden rounded-2xl bg-black">

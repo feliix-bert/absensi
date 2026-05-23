@@ -12,6 +12,8 @@ import {
 } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { signOut, updateProfile } from '@/actions/auth.actions';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 
 interface InfoRowProps {
   icon: React.ElementType;
@@ -40,6 +42,8 @@ export default function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const router = useRouter();
   
   const [state, formAction, isPending] = useActionState(updateProfile, null);
 
@@ -98,6 +102,7 @@ export default function ProfilePage() {
 
           <button 
             onClick={() => setIsEditing(!isEditing)}
+            aria-label={isEditing ? 'Batal Edit Profil' : 'Edit Profil'}
             className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
           >
             {isEditing ? <X size={15} className="text-white" /> : <Edit3 size={15} className="text-white" />}
@@ -212,11 +217,12 @@ export default function ProfilePage() {
           className="card divide-y divide-neutral-100"
         >
           {[
-            { icon: Bell, label: 'Notifikasi', desc: 'Pengaturan pemberitahuan' },
-            { icon: ShieldCheck, label: 'Keamanan', desc: 'Ubah password' },
+            { icon: Bell, label: 'Notifikasi', desc: 'Pengaturan pemberitahuan', action: () => router.push('/notifications') },
+            { icon: ShieldCheck, label: 'Keamanan', desc: 'Ubah password', action: () => setIsPasswordModalOpen(true) },
           ].map((item) => (
             <button
               key={item.label}
+              onClick={item.action}
               className="flex items-center gap-3 w-full px-5 py-4 hover:bg-neutral-50 transition-colors text-left"
             >
               <div className="w-9 h-9 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
@@ -275,10 +281,109 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* ─── Password Change Modal ─── */}
+      {isPasswordModalOpen && (
+        <PasswordChangeModal onClose={() => setIsPasswordModalOpen(false)} />
+      )}
+
       {/* ─── Version ─── */}
       <p className="text-center text-body-sm text-neutral-300 pb-2">
         TelIntern v1.0.0 · © 2026 Telkom Indonesia
       </p>
+    </div>
+  );
+}
+
+function PasswordChangeModal({ onClose }: { onClose: () => void }) {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.length < 6) {
+      setError('Password minimal 6 karakter');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Password tidak cocok');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.updateUser({ password });
+    
+    setLoading(false);
+    if (err) {
+      setError(err.message);
+    } else {
+      setSuccess(true);
+      setTimeout(onClose, 2000);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+      >
+        <h3 className="text-xl font-bold text-neutral-900 mb-4">Ubah Password</h3>
+        
+        {success ? (
+          <div className="text-center py-4">
+            <div className="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Check className="text-success-600" />
+            </div>
+            <p className="text-success-700 font-medium">Password berhasil diubah!</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && <p className="text-danger-600 text-sm font-medium">{error}</p>}
+            <div>
+              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">Password Baru</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                required 
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">Konfirmasi Password Baru</label>
+              <input 
+                type="password" 
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" 
+                required 
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button 
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-2 rounded-xl text-neutral-600 font-medium hover:bg-neutral-100"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit"
+                disabled={loading}
+                className="flex-1 py-2 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 disabled:opacity-50"
+              >
+                {loading ? 'Menyimpan...' : 'Simpan'}
+              </button>
+            </div>
+          </form>
+        )}
+      </motion.div>
     </div>
   );
 }

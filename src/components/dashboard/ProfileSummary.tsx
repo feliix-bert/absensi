@@ -4,11 +4,17 @@ import Link from 'next/link';
 import { Briefcase, GraduationCap, MapPin, ChevronRight } from 'lucide-react';
 import { Avatar } from '@/components/shared/Avatar';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { useState, useEffect } from 'react';
 
 export function ProfileSummary() {
   const profile = useAuthStore(state => state.profile);
-  
-  if (!profile) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !profile) return null;
 
   return (
     <aside className="hidden lg:block">

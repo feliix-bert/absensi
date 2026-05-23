@@ -8,10 +8,9 @@ export async function getDashboardStats() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  // 1. Get total days logic. For MVP, we can assume a flat 90 days or calculate from profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('created_at')
+    .select('created_at, mulai_magang, selesai_magang')
     .eq('id', user.id)
     .single()
 
@@ -44,7 +43,28 @@ export async function getDashboardStats() {
   const attendedDays = records.filter(r => r.status === 'Hadir').length
   const lateDays = records.filter(r => r.status === 'Terlambat').length
   const izinDays = records.filter(r => r.status === 'Izin' || r.status === 'Sakit').length
-  const alphaDays = records.filter(r => r.status === 'Alpha' || r.status === 'Absen').length
+  
+  // Calculate dynamic Alpha days (past weekdays without attendance)
+  let calculatedAlphaDays = 0;
+  const startCalcDate = profile?.mulai_magang ? new Date(Math.max(new Date(profile.mulai_magang).getTime(), new Date(monthStart).getTime())) : new Date(monthStart);
+  const endCalcDate = subDays(startOfDay(new Date()), 1); // Up to yesterday
+  
+  if (startCalcDate <= endCalcDate) {
+    let curr = new Date(startCalcDate);
+    while (curr <= endCalcDate) {
+      // 0 = Sunday, 6 = Saturday
+      if (curr.getDay() !== 0 && curr.getDay() !== 6) {
+        const currIso = curr.toISOString().split('T')[0];
+        const hasRecord = records.some(r => r.check_in.startsWith(currIso));
+        if (!hasRecord) {
+          calculatedAlphaDays++;
+        }
+      }
+      curr.setDate(curr.getDate() + 1);
+    }
+  }
+
+  const alphaDays = records.filter(r => r.status === 'Alpha').length + calculatedAlphaDays
 
   // Streak logic (basic)
   let streakDays = 0
@@ -90,7 +110,9 @@ export async function getDashboardStats() {
       alphaDays,
       streakDays,
       attendanceRate,
-      totalDays: 30, // For now, assume 30 days in month
+      totalDays: profile?.selesai_magang && profile?.mulai_magang ? 
+        Math.max(1, Math.ceil((new Date(profile.selesai_magang).getTime() - new Date(profile.mulai_magang).getTime()) / (1000 * 60 * 60 * 24))) 
+        : 30,
     },
     recentActivity
   }

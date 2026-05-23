@@ -11,6 +11,7 @@ interface AuthState {
   setSession: (session: Session | null) => void
   setProfile: (profile: any | null) => void
   initialize: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -21,6 +22,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
   setSession: (session) => set({ session }),
   setProfile: (profile) => set({ profile }),
+  refreshProfile: async () => {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*, offices(nama, radius, latitude, longitude)')
+        .eq('id', session.user.id)
+        .single()
+      if (profile) set({ profile })
+    }
+  },
   initialize: async () => {
     try {
       const supabase = createClient()

@@ -97,7 +97,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
       latitude: payload.latitude,
       longitude: payload.longitude,
       accuracy: payload.accuracy,
-      status: 'Hadir', // Basic logic, could be enhanced with time checks for 'Terlambat'
+      status: new Date().getHours() >= 9 ? 'Terlambat' : 'Hadir',
       qr_token: payload.qrToken
     })
 
@@ -128,4 +128,44 @@ export async function getAttendanceHistory(monthYyyyMm: string) {
     .order('check_in', { ascending: false })
 
   return data || []
+}
+
+export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: string }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  // Prevent Duplicate Izin for Today
+  const todayStart = startOfDay(new Date()).toISOString()
+  const todayEnd = endOfDay(new Date()).toISOString()
+
+  const { data: existingAttendance } = await supabase
+    .from('attendance')
+    .select('id')
+    .eq('user_id', user.id)
+    .gte('check_in', todayStart)
+    .lte('check_in', todayEnd)
+    .single()
+
+  if (existingAttendance) {
+    return { error: 'Anda sudah melakukan absensi hari ini.' }
+  }
+
+  const { error } = await supabase
+    .from('attendance')
+    .insert({
+      user_id: user.id,
+      check_in: new Date().toISOString(),
+      status: payload.type,
+      notes: payload.reason,
+      location: '-', // Explicitly set or let default
+      accuracy: 0,
+    })
+
+  if (error) {
+    console.error(error)
+    return { error: 'Gagal mengajukan izin' }
+  }
+
+  return { success: true, message: `Berhasil mengajukan ${payload.type}` }
 }
