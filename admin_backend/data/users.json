@@ -1,0 +1,48 @@
+{
+  "_comment": "File ini adalah database pengguna. Jangan diedit sembarangan! Gunakan endpoint /api/admin/users untuk menambah user baru.",
+  "_note_password": "Password di sini sudah di-hash dengan bcrypt. Gunakan script add-user.js untuk menambah user baru.",
+  "users": [
+    {
+      "id": "usr_admin_001",
+      "name": "Admin Sistem",
+      "nik": "ADM-00001",
+      "role": "admin",
+      "passwordHash": "$2a$10$qU8CfEzgvisI4xx9KUNJguZX5EVRzbUzfnPQXNVTvLDMSTPE/cIMa",
+      "_password_plain": "admin123 (GANTI SEGERA! Hapus baris ini setelah ganti password)",
+      "cohort": "staff",
+      "isActive": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "usr_mgr_001",
+      "name": "Budi Santoso",
+      "nik": "MGR-00001",
+      "role": "manager",
+      "passwordHash": "$2a$10$qU8CfEzgvisI4xx9KUNJguZX5EVRzbUzfnPQXNVTvLDMSTPE/cIMa",
+      "_password_plain": "admin123 (GANTI SEGERA! Hapus baris ini setelah ganti password)",
+      "cohort": "staff",
+      "isActive": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "usr_intern_b9fcdf03",
+      "name": "Galih Artha Ditha",
+      "nik": "171007",
+      "role": "intern",
+      "passwordHash": "$2a$10$nsd5wx8MhIAatiJ1Pt538emmSp6mvgMZSdZeVFvWxQTII/4t9HrBK",
+      "cohort": "2026",
+      "isActive": true,
+      "createdAt": "2026-05-21T09:35:13.546Z"
+    },
+    {
+      "id": "usr_intern_6c072440",
+      "name": "FELIX GILBERT",
+      "nik": "1012",
+      "role": "intern",
+      "passwordHash": "$2a$10$vOxdCAWhsM383QBvpJwT5OOT7zgamWbZjz6c4qbPdYuYZ9spv2Zei",
+      "cohort": "2026",
+      "isActive": true,
+      "createdAt": "2026-05-23T18:09:24.971Z"
+    }
+  ]
+}

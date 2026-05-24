@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tel Intern</title>
+
+  <!-- Global Error Handler for Debugging -->
+  <script>
+    window.onerror = function (message, source, lineno, colno, error) {
+      alert("JavaScript Error:\n" + message + "\n\nSource: " + source + "\nLine: " + lineno + "\nColumn: " + colno + "\nStack: " + (error ? error.stack : 'N/A'));
+      return false;
+    };
+  </script>
+
+  <!-- Terhubung ke file CSS terpisah -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+    rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+
+  <!-- jsPDF & AutoTable for PDF Export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+  <!-- ============================================================
+     LOGIN PAGE
+     ============================================================ -->
+  <section class="page" id="page-login">
+    <div class="login-bg"></div>
+
+    <!-- PANEL WRAPPER — animasi slide antara login dan register -->
+    <div class="login-modal" id="login-modal-card">
+
+      <!-- ── BRAND HEADER ── -->
+      <div class="login-logo" id="auth-logo">
+        <span class="material-symbols-outlined"
+          style="font-variation-settings:'FILL' 1;font-size:32px;">domain_verification</span>
+      </div>
+      <h1 class="login-title" id="auth-modal-title">Tel Intern</h1>
+      <p class="login-subtitle" id="auth-modal-subtitle">Akses aman ke sistem manajemen.</p>
+
+      <!-- ══ PANEL LOGIN ══ -->
+      <div id="login-panel" class="auth-panel">
+        <form id="login-form" class="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-name">Nama Lengkap</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">person</span>
+              <input type="text" id="login-name" name="fullName" placeholder="Artha" required autocomplete="name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="login-nik">NIK / ID Magang</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">badge</span>
+              <input type="text" id="login-nik" name="nik" placeholder="EMP-12345" required autocomplete="off" class="mono" />
+            </div>
+          </div>
+          <!-- Role tersembunyi, ditentukan backend -->
+          <div id="login-role-group" style="display:none;">
+            <select id="login-role" name="role">
+              <option value="intern">Intern</option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">lock</span>
+              <input type="password" id="login-password" name="password" placeholder="Password Anda"
+                required autocomplete="current-password" minlength="6" />
+              <button type="button" id="toggle-password" class="password-toggle"
+                aria-label="Tampilkan password" tabindex="-1">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary btn-full" id="login-submit-btn">
+            <span>Masuk</span>
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">login</span>
+          </button>
+        </form>
+
+        <!-- Action chips -->
+        <div class="auth-actions">
+          <button class="auth-chip auth-chip--blue" id="show-register-btn" type="button">
+            <span class="material-symbols-outlined">person_add</span>
+            <span>Intern baru? Daftar</span>
+          </button>
+          <button class="auth-chip auth-chip--amber" id="forgot-password-btn" type="button">
+            <span class="material-symbols-outlined">key_off</span>
+            <span>Lupa Password</span>
+          </button>
+          <button class="auth-chip auth-chip--gray" id="contact-admin-btn" type="button">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span>Hubungi Admin</span>
+          </button>
+        </div>
+        <p class="login-copyright">&copy; 2026 Pillar System. All rights reserved.</p>
+      </div>
+
+      <!-- ══ PANEL REGISTER ══ -->
+      <div id="register-panel" class="auth-panel auth-panel--hidden">
+        <form id="register-form" class="login-form" novalidate>
+          <div class="form-group">
+            <label for="reg-name">Nama Lengkap</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">person</span>
+              <input type="text" id="reg-name" placeholder="Nama lengkap Anda" required autocomplete="name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-nik">NIK / ID Magang</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">badge</span>
+              <input type="text" id="reg-nik" placeholder="EMP-12345" required autocomplete="off" class="mono" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">lock</span>
+              <input type="password" id="reg-password" placeholder="Min. 6 karakter"
+                required minlength="6" autocomplete="new-password" />
+              <button type="button" class="password-toggle" id="toggle-reg-password"
+                aria-label="Tampilkan password" tabindex="-1">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm">Konfirmasi Password</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined input-icon">lock_reset</span>
+              <input type="password" id="reg-confirm" placeholder="Ulangi password"
+                required minlength="6" autocomplete="new-password" />
+              <button type="button" class="password-toggle" id="toggle-reg-confirm"
+                aria-label="Tampilkan password" tabindex="-1">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div class="reg-role-notice">
+            <span class="material-symbols-outlined" style="font-size:16px;flex-shrink:0;">info</span>
+            Akun baru otomatis berperan sebagai <strong>Intern</strong>.
+          </div>
+          <button type="submit" class="btn-primary btn-full" id="register-submit-btn">
+            <span>Buat Akun</span>
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">how_to_reg</span>
+          </button>
+        </form>
+
+        <div class="auth-actions auth-actions--centered">
+          <button class="auth-chip auth-chip--gray" id="back-to-login-btn" type="button">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Sudah punya akun? Masuk</span>
+          </button>
+        </div>
+        <p class="login-copyright">&copy; 2026 Pillar System. All rights reserved.</p>
+      </div>
+
+    </div><!-- /.login-modal -->
+  </section>
+
+  <!-- ============================================================
+     APP SHELL (Sidebar + Topbar + Pages)
+     ============================================================ -->
+  <div id="app-shell" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sidebar-brand">
+        <h1>Pillar</h1>
+        <span class="sidebar-sub">Management System</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li data-roles="admin,manager">
+          <a href="#" class="nav-link" data-page="dashboard">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
+            Dashboard
+          </a>
+        </li>
+        <li data-roles="intern">
+          <a href="#" class="nav-link" data-page="attendance">
+            <span class="material-symbols-outlined">calendar_today</span>
+            Kehadiran
+          </a>
+        </li>
+        <li data-roles="intern">
+          <a href="#" class="nav-link" data-page="performance">
+            <span class="material-symbols-outlined">analytics</span>
+            Kinerja
+          </a>
+        </li>
+        <li data-roles="intern">
+          <a href="#" class="nav-link" data-page="history">
+            <span class="material-symbols-outlined">history</span>
+            Riwayat
+          </a>
+        </li>
+        <li data-roles="admin,manager">
+          <a href="#" class="nav-link" data-page="team">
+            <span class="material-symbols-outlined">group</span>
+            Tim
+          </a>
+        </li>
+        <li data-roles="intern,admin,manager">
+          <a href="#" class="nav-link" data-page="settings">
+            <span class="material-symbols-outlined">settings</span>
+            Pengaturan
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-user" id="sidebar-user-wrap" style="cursor: pointer;" title="Pengaturan Akun">
+        <div class="sidebar-avatar" id="sidebar-avatar-initials"></div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="sidebar-user-name">—</span>
+          <span class="sidebar-user-role" id="sidebar-user-role">—</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div id="sidebar-overlay"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div id="main-wrapper">
+
+      <!-- TOPBAR -->
+      <header id="topbar">
+        <div class="topbar-left">
+          <button id="menu-btn" aria-label="Open menu">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <div class="topbar-search" id="topbar-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="topbar-search" placeholder="Cari…" />
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="live-clock mono" id="topbar-clock">00:00:00</div>
+          <button class="topbar-icon-btn" aria-label="Notifications" id="notif-btn">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="notif-dot"></span>
+          </button>
+          <button class="topbar-icon-btn" aria-label="Schedule" id="schedule-btn" title="Jadwal Shift">
+            <span class="material-symbols-outlined">schedule</span>
+          </button>
+          <div class="topbar-avatar" id="topbar-avatar" style="cursor: pointer;" title="Pengaturan Akun"></div>
+        </div>
+      </header>
+
+      <!-- ============================================================
+         PAGE: DASHBOARD (Admin/Manager)
+         ============================================================ -->
+      <section class="page app-page" id="page-dashboard" data-roles="admin,manager">
+        <div class="page-content">
+          <div class="page-header">
+            <h2 class="page-title">Ikhtisar</h2>
+            <p class="page-subtitle">Metrik kehadiran harian dan tren kinerja.</p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card accent-blue">
+              <div class="kpi-header">
+                <span class="kpi-label">Total Intern</span>
+                <span class="material-symbols-outlined kpi-icon">group</span>
+              </div>
+              <div class="kpi-value" id="dash-total">124</div>
+              <div class="kpi-footer"><span class="material-symbols-outlined">arrow_upward</span> Kohort Aktif</div>
+            </div>
+            <div class="kpi-card accent-green">
+              <div class="kpi-header">
+                <span class="kpi-label">Hadir Hari Ini</span>
+                <span class="material-symbols-outlined kpi-icon">how_to_reg</span>
+              </div>
+              <div class="kpi-value" id="dash-present">112</div>
+              <div class="kpi-footer kpi-green" id="dash-rate">90.3% Tingkat Kehadiran</div>
+            </div>
+            <div class="kpi-card accent-amber">
+              <div class="kpi-header">
+                <span class="kpi-label">Terlambat</span>
+                <span class="material-symbols-outlined kpi-icon">schedule</span>
+              </div>
+              <div class="kpi-value" id="dash-late">8</div>
+              <div class="kpi-footer kpi-amber"><span class="material-symbols-outlined">warning</span> Perlu Ditinjau
+              </div>
+            </div>
+            <div class="kpi-card accent-red">
+              <div class="kpi-header">
+                <span class="kpi-label">Absen</span>
+                <span class="material-symbols-outlined kpi-icon">person_off</span>
+              </div>
+              <div class="kpi-value kpi-red" id="dash-absent">4</div>
+              <div class="kpi-footer kpi-red"><span class="material-symbols-outlined">error</span> Butuh Tindakan</div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card chart-main">
+              <div class="chart-header">
+                <h3>Tren Kehadiran Bulanan</h3>
+                <button class="btn-text">Lihat Laporan Lengkap</button>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3>Status Harian</h3>
+                <p class="chart-subhead">Rincian Hari Ini</p>
+              </div>
+              <div class="chart-wrap donut-wrap">
+                <canvas id="statusChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Logs Table (Admin) -->
+          <div class="table-card" data-roles="admin,manager">
+            <div class="table-header">
+              <h3>Log Kehadiran Terbaru</h3>
+              <input type="text" class="table-search" id="dash-table-search" placeholder="Filter nama…" />
+            </div>
+            <div class="table-scroll">
+              <table id="dash-logs-table">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>NIK</th>
+                    <th>Tanggal</th>
+                    <th>Waktu Masuk</th>
+                    <th>Waktu Keluar</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-logs-body">
+                  <tr>
+                    <td colspan="6" class="empty-row">Memuat…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: ATTENDANCE (Intern primary)
+         ============================================================ -->
+      <section class="page app-page" id="page-attendance" data-roles="intern">
+        <div class="page-content">
+          <!-- GPS Status Banner -->
+          <div class="gps-banner validation" id="gps-banner">
+            <div class="gps-banner-left">
+              <span class="material-symbols-outlined gps-icon" id="gps-icon">my_location</span>
+              <span id="gps-text">Memvalidasi Lokasi...</span>
+            </div>
+            <span class="gps-accuracy mono" id="gps-accuracy">Acquiring satellites…</span>
+          </div>
+
+          <div class="attendance-grid">
+            <!-- Left: Clock + Check-In -->
+            <div class="attendance-left">
+              <div class="clock-card">
+                <div class="clock-label">Waktu Saat Ini</div>
+                <div class="clock-display mono" id="att-clock">00:00:00</div>
+                <div class="clock-date" id="att-date">Memuat…</div>
+              </div>
+
+              <div class="checkin-card" id="checkin-card">
+                <div class="checkin-info">
+                  <h3>Check-In Harian</h3>
+                  <p>Pastikan Anda berada di dalam radius kantor yang ditentukan.</p>
+                </div>
+                <button class="btn-primary checkin-btn" id="checkin-btn" disabled>
+                  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">how_to_reg</span>
+                  <span id="checkin-btn-label">Check-In</span>
+                </button>
+              </div>
+
+              <!-- Activity Recap -->
+              <div class="table-card">
+                <div class="table-header">
+                  <h3>Rekap Aktivitas Hari Ini</h3>
+                </div>
+                <div class="table-scroll">
+                  <table id="recap-table">
+                    <thead>
+                      <tr>
+                        <th>Tipe</th>
+                        <th>Waktu</th>
+                        <th>Lokasi</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recap-body">
+                      <tr>
+                        <td colspan="4" class="empty-row">Belum ada aktivitas hari ini.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Status + Map -->
+            <div class="attendance-right">
+              <div class="status-card" id="att-status-card">
+                <div class="status-icon-wrap status-working">
+                  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">work</span>
+                </div>
+                <div class="status-info">
+                  <div class="status-label">Status Saat Ini</div>
+                  <div class="status-value" id="att-status-value">Belum Check-In</div>
+                  <div class="status-sub" id="att-status-sub">—</div>
+                </div>
+              </div>
+
+              <div class="map-card">
+                <div class="map-visual">
+                  <div class="map-pin" id="map-pin">
+                    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">location_on</span>
+                  </div>
+                  <div class="map-rings"></div>
+                </div>
+                <div class="map-info">
+                  <div class="map-distance-label">Jarak dari Kantor</div>
+                  <div class="distance-bar-wrap">
+                    <div class="distance-bar">
+                      <div class="distance-fill" id="distance-fill"></div>
+                    </div>
+                    <span class="mono distance-text" id="distance-text">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: PERFORMANCE
+         ============================================================ -->
+      <section class="page app-page" id="page-performance" data-roles="intern,admin,manager">
+        <div class="page-content">
+          <div class="page-header perf-page-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button class="btn-back" id="perf-back-btn" style="display: none;" title="Kembali ke Tim">
+                <span class="material-symbols-outlined">arrow_back</span>
+              </button>
+              <div>
+                <h2 class="page-title" id="perf-name">—</h2>
+                <p class="page-subtitle" id="perf-role">—</p>
+              </div>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn-outline" id="export-btn">
+                <span class="material-symbols-outlined">download</span> Ekspor CSV
+              </button>
+              <button class="btn-outline" id="export-pdf-btn">
+                <span class="material-symbols-outlined">picture_as_pdf</span> Ekspor PDF
+              </button>
+              <button class="btn-primary" id="manual-entry-btn" data-roles="admin,manager">Log Manual</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid kpi-3col">
+            <div class="kpi-card accent-green">
+              <div class="kpi-header">
+                <span class="kpi-label">Streak Kehadiran</span>
+                <span class="material-symbols-outlined kpi-icon">local_fire_department</span>
+              </div>
+              <div class="kpi-value" id="perf-streak">—</div>
+              <div class="kpi-footer kpi-green"><span class="material-symbols-outlined">trending_up</span> Hari
+                Berturut-turut</div>
+            </div>
+            <div class="kpi-card accent-red">
+              <div class="kpi-header">
+                <span class="kpi-label">% Tepat Waktu</span>
+                <span class="material-symbols-outlined kpi-icon">timer</span>
+              </div>
+              <div class="kpi-value" id="perf-ontime">—</div>
+              <div class="kpi-progress-bar">
+                <div class="kpi-progress-fill" id="perf-ontime-bar"></div>
+              </div>
+            </div>
+            <div class="kpi-card accent-blue">
+              <div class="kpi-header">
+                <span class="kpi-label">Total Jam Terdata</span>
+                <span class="material-symbols-outlined kpi-icon">hourglass_top</span>
+              </div>
+              <div class="kpi-value" id="perf-hours">—</div>
+              <div class="kpi-footer">Jam Alfa</div>
+            </div>
+          </div>
+
+          <!-- Performance Chart -->
+          <div class="chart-card chart-full">
+            <div class="chart-header">
+              <h3>Kehadiran Seiring Waktu</h3>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="perfChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: HISTORY
+         ============================================================ -->
+      <section class="page app-page" id="page-history" data-roles="intern">
+        <div class="page-content">
+          <div class="page-header">
+            <h2 class="page-title">Riwayat Kehadiran</h2>
+            <p class="page-subtitle" id="history-subtitle">Log kehadiran lengkap Anda.</p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Catatan Log</h3>
+              <div class="table-controls">
+                <select id="history-filter" class="select-sm">
+                  <option value="30">30 Hari Terakhir</option>
+                  <option value="90">Kuartal Ini</option>
+                  <option value="all">Sepanjang Waktu</option>
+                </select>
+                <input type="text" class="table-search" id="history-search" placeholder="Cari…" />
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table id="history-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Waktu Masuk</th>
+                    <th>Waktu Keluar</th>
+                    <th>Lokasi</th>
+                    <th class="text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body">
+                  <tr>
+                    <td colspan="5" class="empty-row">Memuat…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="table-count" id="history-count">—</span>
+              <div class="pagination" id="history-pagination"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: TEAM (Admin/Manager)
+         ============================================================ -->
+      <section class="page app-page" id="page-team" data-roles="admin,manager">
+        <div class="page-content">
+          <div class="page-header perf-page-header">
+            <div>
+              <h2 class="page-title">Tim</h2>
+              <p class="page-subtitle">Semua intern yang terdaftar dan status mereka saat ini.</p>
+            </div>
+            <div class="page-header-actions">
+              <button class="btn-outline" id="team-export-btn">
+                <span class="material-symbols-outlined">download</span> Ekspor CSV
+              </button>
+              <button class="btn-outline" id="team-export-pdf-btn">
+                <span class="material-symbols-outlined">picture_as_pdf</span> Ekspor PDF
+              </button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Daftar Intern</h3>
+              <input type="text" class="table-search" id="team-search" placeholder="Cari nama atau NIK…" />
+            </div>
+            <div class="table-scroll">
+              <table id="team-table">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>NIK</th>
+                    <th>Streak</th>
+                    <th>% Tepat Waktu</th>
+                    <th>Hari Ini</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="team-body">
+                  <tr>
+                    <td colspan="6" class="empty-row">Memuat…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: SETTINGS
+         ============================================================ -->
+      <section class="page app-page" id="page-settings" data-roles="intern,admin,manager">
+        <div class="page-content">
+          <div class="page-header">
+            <h2 class="page-title">Pengaturan</h2>
+            <p class="page-subtitle">Kelola akun dan preferensi aplikasi Anda.</p>
+          </div>
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>Informasi Akun</h3>
+              <div class="settings-avatar-row">
+                <div class="settings-avatar" id="settings-avatar"></div>
+                <div>
+                  <div class="settings-user-name" id="settings-name">—</div>
+                  <div class="settings-user-role" id="settings-role-display">—</div>
+                  <div class="settings-user-nik mono" id="settings-nik">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="settings-card danger-zone">
+              <h3>Sesi</h3>
+              <p class="settings-hint">Akhiri sesi Anda saat ini dan kembali ke layar login.</p>
+              <button class="btn-danger" id="logout-btn">
+                <span class="material-symbols-outlined">logout</span> Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         PAGE: SIGN OUT CONFIRMATION
+         ============================================================ -->
+      <section class="page app-page" id="page-signout" data-roles="intern,admin,manager">
+        <div class="logout-container">
+          <div class="logout-card">
+            <div class="logout-header">
+              <div class="logout-icon-wrap">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">logout</span>
+              </div>
+              <h2 class="logout-title">Konfirmasi Keluar</h2>
+            </div>
+            
+            <div class="logout-body">
+              <p class="logout-subtitle-large">Apakah Anda yakin ingin keluar?</p>
+              <p class="logout-description">Mengakhiri sesi akan memerlukan Anda untuk masuk kembali untuk mengakses dasbor dan data Anda.</p>
+            </div>
+            
+            <div class="logout-actions">
+              <button id="confirm-logout-btn" class="btn-logout-confirm">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Ya, Keluar</span>
+              </button>
+              <button class="btn-logout-cancel" onclick="window.history.back()">
+                <span>Batal</span>
+              </button>
+            </div>
+            
+            <div class="logout-meta">
+              <span id="logout-sess-id" class="mono">Sess_ID: 8829-XP-01</span>
+              <span class="mono">V2.4</span>
+            </div>
+          </div>
+          <p class="logout-helper-text">
+            Progres terakhir Anda di tab "Kinerja" telah disimpan secara otomatis.
+          </p>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <p>&copy; 2026 Pillar Management System. All rights reserved.</p>
+      </footer>
+
+    </div><!-- /#main-wrapper -->
+
+    <!-- BOTTOM NAV (mobile) -->
+    <nav id="bottom-nav">
+      <a href="#" class="bottom-nav-item" data-page="dashboard" data-roles="admin,manager">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Beranda</span>
+      </a>
+      <a href="#" class="bottom-nav-item" data-page="attendance" data-roles="intern">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <span>Check-In</span>
+      </a>
+      <a href="#" class="bottom-nav-item" data-page="performance" data-roles="intern">
+        <span class="material-symbols-outlined">analytics</span>
+        <span>Statistik</span>
+      </a>
+      <a href="#" class="bottom-nav-item" data-page="history" data-roles="intern">
+        <span class="material-symbols-outlined">history</span>
+        <span>Riwayat</span>
+      </a>
+      <a href="#" class="bottom-nav-item" data-page="settings" data-roles="intern,admin,manager">
+        <span class="material-symbols-outlined">settings</span>
+        <span>Pengaturan</span>
+      </a>
+    </nav>
+
+  </div><!-- /#app-shell -->
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Manual Entry Modal -->
+  <div id="manual-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Log Manual Entry</h3>
+        <button class="modal-close" id="modal-close-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="manual-entry-form" novalidate>
+        <div class="form-group">
+          <label for="me-intern">NIK Intern</label>
+          <input type="text" id="me-intern" placeholder="EMP-12345" class="mono" required />
+        </div>
+        <div class="form-group">
+          <label for="me-date">Tanggal</label>
+          <input type="date" id="me-date" required />
+        </div>
+        <div class="form-group">
+          <label for="me-timein">Waktu Masuk</label>
+          <input type="time" id="me-timein" required />
+        </div>
+        <div class="form-group">
+          <label for="me-timeout">Waktu Keluar</label>
+          <input type="time" id="me-timeout" />
+        </div>
+        <div class="form-group">
+          <label for="me-status">Status</label>
+          <select id="me-status">
+            <option value="Hadir">Hadir</option>
+            <option value="Terlambat">Terlambat</option>
+            <option value="WFH">WFH</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Izin">Izin</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" id="modal-cancel-btn">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Entri</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Auth module — harus dimuat sebelum app.js -->
+  <script src="auth.js"></script>
+
+  <!-- Terhubung ke file JS terpisah -->
+  <script src="app.js?v=1.2"></script>
+</body>
+
+</html>
