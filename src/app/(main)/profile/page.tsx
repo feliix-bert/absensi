@@ -186,6 +186,17 @@ export default function ProfilePage() {
               <label className="text-xs font-semibold text-neutral-500 uppercase">Pembimbing</label>
               <input name="pembimbing" defaultValue={profile.pembimbing} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
             </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-neutral-500 uppercase">Tanggal Mulai</label>
+                <input type="date" name="mulai_magang" defaultValue={startDate.split('T')[0]} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-neutral-500 uppercase">Tanggal Selesai</label>
+                <input type="date" name="selesai_magang" defaultValue={endDate.split('T')[0]} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
+              </div>
+            </div>
 
             <button type="submit" disabled={isPending} className="w-full py-2.5 mt-4 bg-primary-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition disabled:opacity-50">
               <Check size={18} /> {isPending ? 'Menyimpan...' : 'Simpan Perubahan'}

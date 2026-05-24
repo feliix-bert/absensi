@@ -37,7 +37,7 @@ export default async function DashboardPage() {
           <DashboardActivity recentActivity={recentActivity} />
         </div>
         <div className="space-y-5">
-          <ProfileSummary />
+          <ProfileSummary profile={profile} />
           <DashboardReminders initialReminders={reminders} />
         </div>
       </div>

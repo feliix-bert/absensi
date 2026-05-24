@@ -21,6 +21,8 @@ const updateProfileSchema = z.object({
   nim: z.string().min(3, 'NIM/NIS/ID Magang minimal 3 karakter'),
   divisi: z.string().min(2, 'Divisi minimal 2 karakter'),
   pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
+  mulai_magang: z.string().min(1, 'Tanggal mulai harus diisi'),
+  selesai_magang: z.string().min(1, 'Tanggal selesai harus diisi'),
 })
 
 export async function updateProfile(prevState: any, formData: FormData) {
