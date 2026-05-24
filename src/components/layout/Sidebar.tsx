@@ -16,10 +16,11 @@ import {
   History,
   User,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn, getInitials } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useNotifications } from '@/hooks/useNotifications';
+import { SidebarLocationStatus } from './SidebarLocationStatus';
 
 const SIDEBAR_ITEMS = [
   { id: 'dashboard', label: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
@@ -32,8 +33,12 @@ const SIDEBAR_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const { unreadCount } = useNotifications();
+  const { unreadCount, fetchNotifications } = useNotifications();
   const profile = useAuthStore((state) => state.profile);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   return (
     <motion.aside
@@ -131,22 +136,7 @@ export function Sidebar() {
       </div>
 
       {/* ── Location Quick Status ── */}
-      {!collapsed && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="mx-3 mb-3 p-3 rounded-lg bg-success-50 border border-success-100"
-        >
-          <div className="flex items-center gap-2">
-            <MapPin size={14} className="text-success-600 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-success-700 truncate">Di dalam radius</p>
-              <p className="text-[10px] text-success-600 truncate">± 45 m dari kantor</p>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      <SidebarLocationStatus collapsed={collapsed} />
 
       {/* ── User ── */}
       <div className="p-3 border-t border-neutral-100">

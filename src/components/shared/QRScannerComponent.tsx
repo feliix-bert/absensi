@@ -1,17 +1,19 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, Exception } from '@zxing/library';
 
 interface QRScannerComponentProps {
   onScanSuccess: (text: string) => void;
   onScanError?: (error: string) => void;
   torchOn?: boolean;
+  onTorchSupportChange?: (supported: boolean) => void;
 }
 
-export function QRScannerComponent({ onScanSuccess, onScanError, torchOn }: QRScannerComponentProps) {
+export function QRScannerComponent({ onScanSuccess, onScanError, torchOn, onTorchSupportChange }: QRScannerComponentProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const codeReader = useRef<BrowserMultiFormatReader | null>(null);
+  const [torchSupported, setTorchSupported] = useState(false);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -30,13 +32,33 @@ export function QRScannerComponent({ onScanSuccess, onScanError, torchOn }: QRSc
           onScanSuccess(result.getText());
         }
         if (error && !(error instanceof Exception)) {
-          // Exception is thrown constantly while scanning and not finding a code,
-          // only report actual errors
           const err = error as Error;
           if (onScanError) onScanError(err.message || 'Error occurred');
         }
       }
-    ).catch(err => {
+    ).then(() => {
+       setTimeout(() => {
+         if (videoRef.current && videoRef.current.srcObject) {
+           const stream = videoRef.current.srcObject as MediaStream;
+           const track = stream.getVideoTracks()[0];
+           if (track && track.getCapabilities) {
+             try {
+               const capabilities = track.getCapabilities();
+               const hasTorch = !!(capabilities as any).torch;
+               setTorchSupported(hasTorch);
+               if (onTorchSupportChange) onTorchSupportChange(hasTorch);
+             } catch (e) {
+               console.error("Torch capability check failed", e);
+               setTorchSupported(false);
+               if (onTorchSupportChange) onTorchSupportChange(false);
+             }
+           } else {
+               setTorchSupported(false);
+               if (onTorchSupportChange) onTorchSupportChange(false);
+           }
+         }
+       }, 500);
+    }).catch(err => {
       console.error(err);
       if (onScanError) onScanError(err.message || 'Kamera tidak dapat diakses');
     });
@@ -50,23 +72,24 @@ export function QRScannerComponent({ onScanSuccess, onScanError, torchOn }: QRSc
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [onScanSuccess, onScanError]);
+  }, [onScanSuccess, onScanError, onTorchSupportChange]);
 
   // Handle Torch
   useEffect(() => {
-    if (videoRef.current && videoRef.current.srcObject) {
+    if (torchSupported && videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       const track = stream.getVideoTracks()[0];
-      if (track) {
-        const capabilities = track.getCapabilities();
-        if ((capabilities as any).torch) {
+      if (track && typeof track.applyConstraints === 'function') {
+        try {
           track.applyConstraints({
             advanced: [{ torch: torchOn }] as any
-          }).catch(console.error);
+          }).catch(e => console.warn('Could not apply torch constraint:', e));
+        } catch (e) {
+          console.error("Failed to apply torch constraint", e);
         }
       }
     }
-  }, [torchOn]);
+  }, [torchOn, torchSupported]);
 
   return (
     <div className="relative w-full max-w-sm mx-auto overflow-hidden rounded-2xl bg-black">

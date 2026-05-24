@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { CalendarDays, MapPin, QrCode, ChevronRight, XCircle, FileText, CheckCircle2 } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { submitIzin } from '@/actions/attendance.actions';
-import { calculateDistance } from '@/features/attendance/utils/geo.utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DashboardLocationStatus } from './DashboardLocationStatus';
 
 interface DashboardTodayProps {
   today: any
@@ -110,23 +110,7 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
   const checkOutTime = hasCheckedOut ? new Date(today.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
 
   const office = Array.isArray(profile?.offices) ? profile?.offices[0] : profile?.offices;
-  const [distance, setDistance] = useState<number | null>(null);
   const [isIzinModalOpen, setIsIzinModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (navigator.geolocation && office?.latitude && office?.longitude) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, office.latitude, office.longitude);
-          setDistance(dist);
-        },
-        () => {
-          setDistance(null);
-        },
-        { enableHighAccuracy: true }
-      );
-    }
-  }, [office]);
 
   const handleIzinSuccess = () => {
     setIsIzinModalOpen(false);
@@ -194,22 +178,7 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
             </div>
           </div>
           
-          <div className="pt-3 border-t border-neutral-100">
-             <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-neutral-500">Status Anda</span>
-                {distance === null ? (
-                  <span className="text-xs font-semibold text-neutral-400">Menunggu Lokasi...</span>
-                ) : distance <= (office?.radius || 150) ? (
-                  <span className="text-xs font-semibold text-success-600 flex items-center gap-1">
-                    <CheckCircle2 size={12} /> Di Dalam Radius
-                  </span>
-                ) : (
-                  <span className="text-xs font-semibold text-danger-600 flex items-center gap-1">
-                    <XCircle size={12} /> Di Luar Radius
-                  </span>
-                )}
-             </div>
-          </div>
+          <DashboardLocationStatus office={office} />
         </div>
 
         <Link href="/scan" className="sm:col-span-2 block group">

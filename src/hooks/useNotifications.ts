@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { create } from 'zustand';
 import { getNotifications, markNotificationRead } from '@/actions/notifications.actions';
 
 export interface NotificationItem {
@@ -10,37 +10,50 @@ export interface NotificationItem {
   created_at: string;
 }
 
-export function useNotifications() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [loading, setLoading] = useState(true);
+interface NotificationsState {
+  notifications: NotificationItem[];
+  loading: boolean;
+  fetched: boolean;
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+  markAllRead: () => Promise<void>;
+}
 
-  useEffect(() => {
-    const fetchNotifs = async () => {
+export const useNotificationsStore = create<NotificationsState>((set, get) => ({
+  notifications: [],
+  loading: true,
+  fetched: false,
+  fetchNotifications: async () => {
+    if (get().fetched) return; // Only fetch once
+    set({ loading: true });
+    try {
       const data = await getNotifications();
-      setNotifications(data as NotificationItem[]);
-      setLoading(false);
-    };
-    fetchNotifs();
-  }, []);
-
-  const markAsRead = async (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+      set({ notifications: data as NotificationItem[], fetched: true });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  markAsRead: async (id: string) => {
+    set(state => ({
+      notifications: state.notifications.map(n => n.id === id ? { ...n, is_read: true } : n)
+    }));
     await markNotificationRead(id);
-  };
-
-  const markAllRead = async () => {
-    const unread = notifications.filter(n => !n.is_read);
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  },
+  markAllRead: async () => {
+    const unread = get().notifications.filter(n => !n.is_read);
+    set(state => ({
+      notifications: state.notifications.map(n => ({ ...n, is_read: true }))
+    }));
     for (const n of unread) {
       await markNotificationRead(n.id);
     }
-  };
+  }
+}));
 
-  return {
-    notifications,
-    unreadCount: notifications.filter(n => !n.is_read).length,
-    loading,
-    markAsRead,
-    markAllRead
-  };
+export function useNotifications() {
+  const store = useNotificationsStore();
+  const unreadCount = store.notifications.filter(n => !n.is_read).length;
+  return { ...store, unreadCount };
 }

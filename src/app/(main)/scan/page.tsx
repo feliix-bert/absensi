@@ -7,11 +7,21 @@ import {
   RotateCcw, Lightbulb, Info, MapPin
 } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
-import { QRScannerComponent } from '@/components/shared/QRScannerComponent';
 import { submitCheckIn } from '@/actions/attendance.actions';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { calculateDistance } from '@/features/attendance/utils/geo.utils';
+
+const QRScannerComponent = dynamic(() => import('@/components/shared/QRScannerComponent').then(mod => mod.QRScannerComponent), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-300 rounded-2xl bg-neutral-50 shadow-sm">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-400 mb-4"></div>
+      <p className="text-neutral-500 text-sm font-medium">Memuat scanner...</p>
+    </div>
+  )
+});
 
 type ScanStep = 'requesting_location' | 'scanning' | 'processing' | 'success' | 'invalid' | 'expired';
 
@@ -149,6 +159,7 @@ export default function ScanPage() {
   const [scanStep, setScanStep] = useState<ScanStep>('requesting_location');
   const [location, setLocation] = useState<{ lat: number; lng: number; acc: number } | null>(null);
   const [torchOn, setTorchOn] = useState(false);
+  const [torchSupported, setTorchSupported] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [scanResult, setScanResult] = useState<any>(null);
   
@@ -247,16 +258,20 @@ export default function ScanPage() {
           <ArrowLeft size={20} />
         </Link>
         <h1 className="text-neutral-900 font-semibold text-body-lg">Scan QR Absensi</h1>
-        <button
-          onClick={() => setTorchOn(!torchOn)}
-          className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-colors',
-            torchOn ? 'bg-warning-100 text-warning-600' : 'bg-white text-neutral-600 hover:bg-neutral-100'
+        <div className="w-10 flex items-center justify-end">
+          {torchSupported && (
+            <button
+              onClick={() => setTorchOn(!torchOn)}
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-colors',
+                torchOn ? 'bg-warning-100 text-warning-600' : 'bg-white text-neutral-600 hover:bg-neutral-100'
+              )}
+              aria-label="Toggle flashlight"
+            >
+              <Lightbulb size={18} />
+            </button>
           )}
-          aria-label="Toggle flashlight"
-        >
-          <Lightbulb size={18} />
-        </button>
+        </div>
       </header>
 
       {/* ─── Scanner Area ─── */}
@@ -272,7 +287,11 @@ export default function ScanPage() {
 
           {scanStep === 'scanning' && (
              <div className="relative rounded-2xl overflow-hidden shadow-xl ring-4 ring-white">
-               <QRScannerComponent onScanSuccess={handleScanSuccess} torchOn={torchOn} />
+               <QRScannerComponent 
+                 onScanSuccess={handleScanSuccess} 
+                 torchOn={torchOn} 
+                 onTorchSupportChange={setTorchSupported} 
+               />
                <div className="absolute inset-0 pointer-events-none">
                  <ScanFrame active={true} />
                </div>

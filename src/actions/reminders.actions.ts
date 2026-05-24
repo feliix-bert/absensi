@@ -41,9 +41,23 @@ export async function addReminder(formData: FormData) {
   const title = formData.get('title') as string
   if (!title || !title.trim()) return { error: 'Judul tidak boleh kosong' }
 
+  const dueDateStr = formData.get('dueDate') as string | null
+  let dueDate = null;
+  if (dueDateStr && dueDateStr.trim() !== '') {
+    try {
+      dueDate = new Date(dueDateStr).toISOString();
+    } catch (e) {
+      console.error('Invalid date format', dueDateStr);
+    }
+  }
+
   const { error } = await supabase
     .from('reminders')
-    .insert({ user_id: user.id, title: title.trim() })
+    .insert({ 
+      user_id: user.id, 
+      title: title.trim(),
+      due_date: dueDate
+    })
 
   if (error) {
     console.error(error)

@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, QrCode, Clock, UserCircle, Bell, History, User } from 'lucide-react';
+import { LayoutDashboard, QrCode, History, Bell, User } from 'lucide-react';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
@@ -17,7 +19,14 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, fetchNotifications } = useNotifications();
+  const profile = useAuthStore((state) => state.profile);
+
+  useEffect(() => {
+    if (profile) {
+      fetchNotifications();
+    }
+  }, [fetchNotifications, profile]);
 
   return (
     <nav
