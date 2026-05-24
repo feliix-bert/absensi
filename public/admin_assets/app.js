@@ -508,7 +508,13 @@ function initLogin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nik, password }),
       });
-      const data = await res.json();
+      let data;
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Server Error ${res.status}: ${text.substring(0, 100)}`);
+      }
 
       if (!res.ok) {
         showToast(data.error || 'Login gagal. Periksa NIK dan password.', 'error');
@@ -535,7 +541,7 @@ function initLogin() {
 
     } catch (err) {
       console.error('Login network error:', err);
-      showToast('Tidak dapat terhubung ke server. Pastikan Anda memiliki koneksi internet atau coba beberapa saat lagi.', 'error');
+      showToast('Error: ' + err.message, 'error');
     } finally {
       if (btn) btn.disabled = false;
       if (lbl) lbl.textContent = 'Masuk';
@@ -579,7 +585,13 @@ function initLogin() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, nik, password }),
       });
-      const data = await res.json();
+      let data;
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Server Error ${res.status}: ${text.substring(0, 100)}`);
+      }
 
       if (!res.ok) {
         showToast(data.error || 'Pendaftaran gagal. Coba lagi.', 'error');

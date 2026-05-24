@@ -8,10 +8,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'RAHASIA_SUPER_KUAT_GANTI_INI_SEKAR
 const JWT_EXPIRES_IN = '8h';
 const BCRYPT_ROUNDS = 10;
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+let supabase: any = null;
+let supabaseError = '';
+try {
+  if (!supabaseUrl || !supabaseKey) throw new Error('Missing Supabase URL or Key');
+  supabase = createClient(supabaseUrl, supabaseKey);
+} catch (err: any) {
+  supabaseError = err.message;
+}
 
 // Helper for extracting token
 function getAuthToken(req: NextRequest) {
@@ -41,6 +48,8 @@ function requireAdminOrManager(user: any) {
 
 // Handler functions
 async function handlePost(path: string, req: NextRequest) {
+  if (supabaseError) return NextResponse.json({ success: false, error: 'Server misconfiguration: ' + supabaseError }, { status: 500 });
+
   if (path === 'auth/login') {
     const { nik, password } = await req.json();
     if (!nik || !password) return NextResponse.json({ success: false, error: 'NIK dan password wajib diisi.' }, { status: 400 });
@@ -137,6 +146,8 @@ async function handlePost(path: string, req: NextRequest) {
 }
 
 async function handleGet(path: string, req: NextRequest) {
+  if (supabaseError) return NextResponse.json({ success: false, error: 'Server misconfiguration: ' + supabaseError }, { status: 500 });
+
   if (path === 'auth/verify') {
     let user;
     try { user = requireAuth(req); } catch (e: any) { return handleAuthError(e); }
@@ -168,6 +179,8 @@ async function handleGet(path: string, req: NextRequest) {
 }
 
 async function handlePut(path: string, req: NextRequest) {
+  if (supabaseError) return NextResponse.json({ success: false, error: 'Server misconfiguration: ' + supabaseError }, { status: 500 });
+
   if (path.startsWith('admin/users/')) {
     const id = path.split('/')[2];
     let user;
@@ -191,6 +204,8 @@ async function handlePut(path: string, req: NextRequest) {
 }
 
 async function handleDelete(path: string, req: NextRequest) {
+  if (supabaseError) return NextResponse.json({ success: false, error: 'Server misconfiguration: ' + supabaseError }, { status: 500 });
+
   if (path.startsWith('admin/users/')) {
     const id = path.split('/')[2];
     let user;
