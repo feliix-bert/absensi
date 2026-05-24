@@ -11,7 +11,7 @@
  * 5. Role user diambil dari token (sudah dikunci di backend), tidak bisa dipalsukan
  */
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = '/api/admin-api';
 
 // ============================================================
 // TOKEN MANAGEMENT — menggunakan sessionStorage

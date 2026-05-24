@@ -503,7 +503,7 @@ function initLogin() {
     if (lbl) lbl.textContent = 'Memverifikasi…';
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch('/api/admin-api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nik, password }),
@@ -535,7 +535,7 @@ function initLogin() {
 
     } catch (err) {
       console.error('Login network error:', err);
-      showToast('Tidak dapat terhubung ke server. Pastikan backend berjalan di port 3001.', 'error');
+      showToast('Tidak dapat terhubung ke server. Pastikan Anda memiliki koneksi internet atau coba beberapa saat lagi.', 'error');
     } finally {
       if (btn) btn.disabled = false;
       if (lbl) lbl.textContent = 'Masuk';
@@ -574,7 +574,7 @@ function initLogin() {
     if (lbl) lbl.textContent = 'Mendaftarkan…';
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/register', {
+      const res = await fetch('/api/admin-api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, nik, password }),
@@ -606,7 +606,7 @@ function initLogin() {
 
     } catch (err) {
       console.error('Register network error:', err);
-      showToast('Tidak dapat terhubung ke server. Pastikan backend berjalan di port 3001.', 'error');
+      showToast('Tidak dapat terhubung ke server. Pastikan Anda memiliki koneksi internet atau coba beberapa saat lagi.', 'error');
     } finally {
       if (btn) btn.disabled = false;
       if (lbl) lbl.textContent = 'Buat Akun';
