@@ -215,22 +215,26 @@ function handleAuthError(e: any) {
 }
 
 // MAIN HANDLERS
-export async function GET(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ slug?: string[] }> }) {
+  const params = await context.params;
   const path = params.slug ? params.slug.join('/') : '';
   return handleGet(path, req);
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ slug?: string[] }> }) {
+  const params = await context.params;
   const path = params.slug ? params.slug.join('/') : '';
   return handlePost(path, req);
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function PUT(req: NextRequest, context: { params: Promise<{ slug?: string[] }> }) {
+  const params = await context.params;
   const path = params.slug ? params.slug.join('/') : '';
   return handlePut(path, req);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { slug?: string[] } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ slug?: string[] }> }) {
+  const params = await context.params;
   const path = params.slug ? params.slug.join('/') : '';
   return handleDelete(path, req);
 }
