@@ -1,34 +1,13 @@
 'use client';
 
 import { formatDate, getGreeting } from '@/lib/utils';
-import { useAuthStore } from '@/features/auth/store/authStore';
 import { Avatar } from '@/components/shared/Avatar';
 
-import { useState, useEffect } from 'react';
-
-export function DashboardGreeting() {
-  const profile = useAuthStore(state => state.profile);
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+export function DashboardGreeting({ profile }: { profile: any }) {
   const today = new Date().toISOString().split('T')[0];
   const firstName = profile?.nama?.split(' ')[0] || 'User';
 
-  if (!mounted) {
-    return (
-      <section className="card-modern p-5 md:p-6 flex items-center justify-between gap-4 border-l-4 border-l-primary-600">
-        <div className="animate-pulse space-y-2 flex-1">
-          <div className="h-4 bg-neutral-200 rounded w-24"></div>
-          <div className="h-6 bg-neutral-200 rounded w-32"></div>
-          <div className="h-4 bg-neutral-200 rounded w-40"></div>
-        </div>
-        <div className="w-16 h-16 rounded-full bg-neutral-200 animate-pulse"></div>
-      </section>
-    );
-  }
+
 
   return (
     <section className="card-modern p-5 md:p-6 flex items-center justify-between gap-4 border-l-4 border-l-primary-600">

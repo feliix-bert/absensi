@@ -6,6 +6,8 @@ import { getInitials, getGreeting } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useNotifications } from '@/hooks/useNotifications';
 
+import { useState, useEffect } from 'react';
+
 interface HeaderProps {
   title?: string;
   showSearch?: boolean;
@@ -14,18 +16,23 @@ interface HeaderProps {
 export function Header({ title, showSearch = false }: HeaderProps) {
   const { unreadCount } = useNotifications();
   const profile = useAuthStore(state => state.profile);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-neutral-100 h-16 flex items-center px-4 md:px-6 gap-4">
       {/* Title or Greeting */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0" suppressHydrationWarning>
         {title ? (
           <h1 className="text-heading-md text-neutral-900 font-semibold truncate">{title}</h1>
         ) : (
-          <div>
+          <div className={!mounted ? 'opacity-0' : 'opacity-100 transition-opacity'}>
             <p className="text-body-sm text-neutral-500">{getGreeting()},</p>
             <p className="text-heading-md font-semibold text-neutral-900 truncate leading-tight">
-              {profile?.nama?.split(' ')[0] || 'User'}
+              {mounted ? (profile?.nama?.split(' ')[0] || 'User') : 'User'}
             </p>
           </div>
         )}
@@ -56,7 +63,7 @@ export function Header({ title, showSearch = false }: HeaderProps) {
 
         {/* Avatar */}
         <div className="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-primary-200 transition-all">
-          {getInitials(profile?.nama || 'U')}
+          {mounted ? getInitials(profile?.nama || 'U') : 'U'}
         </div>
       </div>
     </header>

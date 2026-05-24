@@ -3,40 +3,27 @@
 import { createClient } from '@/utils/supabase/server'
 import { startOfMonth, endOfMonth, startOfDay, endOfDay, subDays } from 'date-fns'
 
-export async function getDashboardStats() {
+export async function getDashboardStats(userId: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('created_at, mulai_magang, selesai_magang')
-    .eq('id', user.id)
-    .single()
-
-  // 2. Get today's attendance
+  // Prepare dates
   const todayStart = startOfDay(new Date()).toISOString()
   const todayEnd = endOfDay(new Date()).toISOString()
-  
-  const { data: todayAttendance } = await supabase
-    .from('attendance')
-    .select('check_in, check_out, status')
-    .eq('user_id', user.id)
-    .gte('check_in', todayStart)
-    .lte('check_in', todayEnd)
-    .single()
-
-  // 3. Get all attendance for the current month to calculate rates
   const monthStart = startOfMonth(new Date()).toISOString()
   const monthEnd = endOfMonth(new Date()).toISOString()
-  
-  const { data: monthAttendance } = await supabase
-    .from('attendance')
-    .select('status, check_in')
-    .eq('user_id', user.id)
-    .gte('check_in', monthStart)
-    .lte('check_in', monthEnd)
-    .order('check_in', { ascending: false })
+
+  // 1. Fetch all required data concurrently
+  const [
+    { data: profile },
+    { data: todayAttendance },
+    { data: monthAttendance }
+  ] = await Promise.all([
+    supabase.from('profiles').select('created_at, mulai_magang, selesai_magang').eq('id', userId).single(),
+    supabase.from('attendance').select('check_in, check_out, status').eq('user_id', userId).gte('check_in', todayStart).lte('check_in', todayEnd).single(),
+    supabase.from('attendance').select('status, check_in').eq('user_id', userId).gte('check_in', monthStart).lte('check_in', monthEnd).order('check_in', { ascending: false })
+  ])
+
+  // Records are already fetched
 
   const records = monthAttendance || []
   
