@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
 import { submitCheckIn } from '@/actions/attendance.actions';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { calculateDistance } from '@/features/attendance/utils/geo.utils';
+import { calculateDistance, getHighAccuracyLocation } from '@/features/attendance/utils/geo.utils';
 
 const QRScannerComponent = dynamic(() => import('@/components/shared/QRScannerComponent').then(mod => mod.QRScannerComponent), {
   ssr: false,
@@ -178,23 +178,20 @@ export default function ScanPage() {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const acc = position.coords.accuracy;
-        setLocation({ lat, lng, acc });
+    getHighAccuracyLocation({ timeoutMs: 12000, desiredAccuracy: 40 })
+      .then((loc) => {
+        setLocation(loc);
         
         // Location Pre-validation
-        if (acc > 100) {
-           setErrorMsg('Akurasi GPS terlalu rendah (±' + Math.round(acc) + 'm). Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik.');
+        if (loc.acc > 100) {
+           setErrorMsg('Akurasi GPS terlalu rendah (±' + Math.round(loc.acc) + 'm). Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik untuk absensi.');
            setScanStep('invalid');
            return;
         }
 
         const office = Array.isArray(profile?.offices) ? profile?.offices[0] : profile?.offices;
         if (office && office.latitude && office.longitude && office.radius) {
-           const dist = calculateDistance(lat, lng, office.latitude, office.longitude);
+           const dist = calculateDistance(loc.lat, loc.lng, office.latitude, office.longitude);
            if (dist > office.radius) {
               setErrorMsg(`Anda berada di luar area kantor. Jarak Anda: ${Math.round(dist)} meter (Maksimal: ${office.radius} meter)`);
               setScanStep('invalid');
@@ -203,13 +200,11 @@ export default function ScanPage() {
         }
         
         setScanStep('scanning'); // Location granted and valid, move to scanning
-      },
-      (err) => {
-        setErrorMsg('Izin lokasi ditolak atau gagal. Tolong izinkan akses lokasi untuk bisa absen.');
+      })
+      .catch((err) => {
+        setErrorMsg(err.message || 'Izin lokasi ditolak atau gagal. Tolong izinkan akses lokasi untuk bisa absen.');
         setScanStep('invalid');
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
+      });
   }, [scanStep, profile]);
 
   // 2. Handle scan success
@@ -287,7 +282,8 @@ export default function ScanPage() {
           {scanStep === 'requesting_location' && (
             <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-300 rounded-2xl bg-white shadow-sm">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-              <p className="text-neutral-500 text-sm font-medium">Memverifikasi lokasi Anda...</p>
+              <p className="text-neutral-500 text-sm font-medium">Mengunci sinyal GPS...</p>
+              <p className="text-neutral-400 text-xs mt-1">(Dapat memakan waktu beberapa detik)</p>
             </div>
           )}
 

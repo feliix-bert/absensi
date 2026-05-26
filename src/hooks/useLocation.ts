@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { calculateDistance } from '@/features/attendance/utils/geo.utils';
+import { calculateDistance, getHighAccuracyLocation } from '@/features/attendance/utils/geo.utils';
 import type { LocationData, LocationStatus } from '@/lib/types';
 
 export function useLocation() {
@@ -29,39 +29,35 @@ export function useLocation() {
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const acc = pos.coords.accuracy;
-
+      getHighAccuracyLocation({ timeoutMs: 12000, desiredAccuracy: 40 })
+        .then((loc) => {
           if (!office || !office.latitude || !office.longitude) {
              // Fallback if no office assigned
-             setData(d => ({ ...d, status: 'outside', latitude: lat, longitude: lng, accuracy: acc, distance: null }));
+             setData(d => ({ ...d, status: 'outside', latitude: loc.lat, longitude: loc.lng, accuracy: loc.acc, distance: null }));
              resolve();
              return;
           }
 
-          if (acc > 100) {
+          if (loc.acc > 100) {
             setData(d => ({
               ...d,
               status: 'low_accuracy',
-              latitude: lat,
-              longitude: lng,
-              accuracy: acc,
+              latitude: loc.lat,
+              longitude: loc.lng,
+              accuracy: loc.acc,
               distance: null,
             }));
             resolve();
             return;
           }
 
-          const dist = calculateDistance(lat, lng, office.latitude, office.longitude);
+          const dist = calculateDistance(loc.lat, loc.lng, office.latitude, office.longitude);
           setData(d => ({
             ...d,
             status: dist <= (office.radius || 150) ? 'inside' : 'outside',
-            latitude: lat,
-            longitude: lng,
-            accuracy: acc,
+            latitude: loc.lat,
+            longitude: loc.lng,
+            accuracy: loc.acc,
             distance: Math.round(dist),
             officeRadius: office.radius,
             officeName: office.nama,
@@ -69,13 +65,11 @@ export function useLocation() {
             officeLongitude: office.longitude,
           }));
           resolve();
-        },
-        (err) => {
+        })
+        .catch(() => {
           setData(d => ({ ...d, status: 'denied' }));
           resolve();
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
+        });
     });
   }, [office]);
 
