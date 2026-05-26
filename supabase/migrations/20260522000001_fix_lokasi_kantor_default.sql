@@ -16,7 +16,7 @@ BEGIN
     WHERE lokasi_kantor IS NULL;
 END $$;
 
--- 3. Update the trigger function to always insert this default office
+-- 3. Update the trigger function to always insert this default office (divisi removed)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $func$
 DECLARE
@@ -30,14 +30,14 @@ BEGIN
         SELECT id INTO def_office FROM public.offices LIMIT 1;
     END IF;
 
-    INSERT INTO public.profiles (id, nama, nim, divisi, pembimbing, durasi_magang, lokasi_kantor)
+    INSERT INTO public.profiles (id, nama, nim, pembimbing, mulai_magang, selesai_magang, lokasi_kantor)
     VALUES (
         new.id,
         new.raw_user_meta_data->>'nama',
         new.raw_user_meta_data->>'nim',
-        new.raw_user_meta_data->>'divisi',
         new.raw_user_meta_data->>'pembimbing',
-        new.raw_user_meta_data->>'durasi_magang',
+        COALESCE((new.raw_user_meta_data->>'mulai_magang')::DATE, CURRENT_DATE),
+        COALESCE((new.raw_user_meta_data->>'selesai_magang')::DATE, CURRENT_DATE + interval '90 days'),
         def_office
     );
     RETURN new;

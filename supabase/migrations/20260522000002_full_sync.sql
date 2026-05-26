@@ -8,7 +8,7 @@ ALTER TABLE public.profiles
 ALTER TABLE public.profiles 
   ADD COLUMN selesai_magang DATE DEFAULT CURRENT_DATE + interval '90 days' NOT NULL;
 
--- 2. Update trigger to include new fields
+-- 2. Update trigger to include new fields (divisi removed)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $func$
 DECLARE
@@ -19,12 +19,11 @@ BEGIN
         SELECT id INTO def_office FROM public.offices LIMIT 1;
     END IF;
 
-    INSERT INTO public.profiles (id, nama, nim, divisi, pembimbing, mulai_magang, selesai_magang, lokasi_kantor)
+    INSERT INTO public.profiles (id, nama, nim, pembimbing, mulai_magang, selesai_magang, lokasi_kantor)
     VALUES (
         new.id,
         new.raw_user_meta_data->>'nama',
         new.raw_user_meta_data->>'nim',
-        new.raw_user_meta_data->>'divisi',
         new.raw_user_meta_data->>'pembimbing',
         COALESCE((new.raw_user_meta_data->>'mulai_magang')::DATE, CURRENT_DATE),
         COALESCE((new.raw_user_meta_data->>'selesai_magang')::DATE, CURRENT_DATE + interval '90 days'),
