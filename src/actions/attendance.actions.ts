@@ -81,6 +81,10 @@ export async function submitCheckIn(payload: AttendancePayload) {
       return { error: 'Anda sudah melakukan absen masuk dan keluar hari ini.' }
     } else {
       // Check out — update existing record
+      if (getWibCurrentHour() < 17) {
+        return { error: 'Absen keluar hanya diizinkan setelah pukul 17:00 WIB.' }
+      }
+      
       const { error: updateError } = await supabase
         .from('attendance')
         .update({ check_out: new Date().toISOString() })

@@ -43,6 +43,7 @@ export function DashboardProgress({ stats, profile }: DashboardProgressProps) {
           <div className="flex gap-4 mt-3 text-center">
             {[
               { l: 'Hadir', v: stats?.attendedDays || 0, c: 'text-emerald-600' },
+              { l: 'Terlambat', v: stats?.lateDays || 0, c: 'text-warning-600' },
               { l: 'Izin', v: stats?.izinDays || 0, c: 'text-primary-600' },
               { l: 'Alpha', v: stats?.alphaDays || 0, c: 'text-red-500' },
             ].map((x) => (
