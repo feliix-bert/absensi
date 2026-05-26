@@ -20,7 +20,7 @@ export async function getDashboardStats(userId: string) {
   ] = await Promise.all([
     supabase.from('profiles').select('created_at, mulai_magang, selesai_magang').eq('id', userId).single(),
     supabase.from('attendance').select('check_in, check_out, status').eq('user_id', userId).gte('check_in', todayStart).lte('check_in', todayEnd).single(),
-    supabase.from('attendance').select('status, check_in').eq('user_id', userId).gte('check_in', monthStart).lte('check_in', monthEnd).order('check_in', { ascending: false })
+    supabase.from('attendance').select('status, check_in, check_out, notes').eq('user_id', userId).gte('check_in', monthStart).lte('check_in', monthEnd).order('check_in', { ascending: false })
   ])
 
   // Records are already fetched
@@ -82,13 +82,22 @@ export async function getDashboardStats(userId: string) {
   // Recent activity (last 5)
   const recentActivity = records.slice(0, 5).map(r => ({
     id: r.check_in,
-    check_in: r.check_in,  // expose raw timestamp for client-side formatting
+    check_in: r.check_in,
+    check_out: r.check_out ?? null,
+    notes: (r as any).notes ?? null,
     action: r.status === 'Hadir' || r.status === 'Terlambat' ? 'Check In' : r.status,
-    time: new Date(r.check_in).toLocaleTimeString('id-ID', {
+    timeIn: new Date(r.check_in).toLocaleTimeString('id-ID', {
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: 'Asia/Jakarta',  // Fix: always convert to WIB, not server UTC
+      timeZone: 'Asia/Jakarta',
     }),
+    timeOut: r.check_out
+      ? new Date(r.check_out).toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'Asia/Jakarta',
+        })
+      : null,
     location: 'Kantor',
     status: r.status
   }))
