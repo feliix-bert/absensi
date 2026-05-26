@@ -19,9 +19,6 @@ export function DashboardGreeting({ profile }: { profile: any }) {
         <p className="text-sm text-neutral-500 mt-1">
           {formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
-        <span className="inline-block mt-3 text-xs font-medium text-secondary-700 bg-secondary-50 px-3 py-1 rounded-full">
-          {profile?.divisi || 'Divisi'}
-        </span>
       </div>
       <Avatar name={profile?.nama || 'User'} size="xl" className="ring-4 ring-primary-50 shrink-0" />
     </section>

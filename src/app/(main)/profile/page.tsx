@@ -50,9 +50,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (state?.success) {
       setIsEditing(false);
-      // Let the auth store fetch the updated profile on next layout render, 
-      // or we can optimistically update it, but revalidatePath will handle it.
-      window.location.reload(); 
+      useAuthStore.getState().refreshProfile();
     }
   }, [state]);
 
@@ -95,7 +93,6 @@ export default function ProfilePage() {
             <h2 className="text-xl font-bold text-white leading-tight">{profile.nama}</h2>
             <p className="text-secondary-300 text-body-sm mt-0.5">{profile.nim}</p>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="badge badge-navy border border-white/10 text-xs">{profile.divisi}</span>
               <span className="badge bg-success-600/20 text-success-400 text-xs">Aktif</span>
             </div>
           </div>
@@ -178,11 +175,6 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-neutral-500 uppercase">Divisi</label>
-              <input name="divisi" defaultValue={profile.divisi} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
-            </div>
-
-            <div className="space-y-1.5">
               <label className="text-xs font-semibold text-neutral-500 uppercase">Pembimbing</label>
               <input name="pembimbing" defaultValue={profile.pembimbing} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
             </div>
@@ -206,7 +198,6 @@ export default function ProfilePage() {
           <>
             <InfoRow icon={User} label="Nama Lengkap" value={profile.nama} />
             <InfoRow icon={Hash} label="NIM / ID Magang" value={profile.nim} />
-            <InfoRow icon={Briefcase} label="Divisi" value={profile.divisi} />
             <InfoRow icon={GraduationCap} label="Pembimbing" value={profile.pembimbing} />
             <InfoRow
               icon={Calendar}
@@ -282,11 +273,16 @@ export default function ProfilePage() {
               >
                 Batal
               </button>
-              <form action={signOut} className="flex-1">
-                <button type="submit" className="w-full py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600">
-                  Ya, Keluar
-                </button>
-              </form>
+              <button 
+                onClick={async () => {
+                  const supabase = createClient();
+                  await supabase.auth.signOut();
+                  router.push('/login');
+                }} 
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600"
+              >
+                Ya, Keluar
+              </button>
             </div>
           </motion.div>
         </div>

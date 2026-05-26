@@ -22,7 +22,6 @@ export interface User {
   id: string;
   name: string;
   nim: string;           // NIM / NIS / ID Magang
-  division: string;
   mentor: string;
   startDate: string;     // ISO date string
   endDate: string;       // ISO date string
@@ -112,7 +111,6 @@ export interface LoginFormData {
 export interface SignupStep1Data {
   name: string;
   nim: string;
-  division: string;
   mentor: string;
 }
 

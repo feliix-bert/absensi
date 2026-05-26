@@ -186,6 +186,12 @@ export default function ScanPage() {
         setLocation({ lat, lng, acc });
         
         // Location Pre-validation
+        if (acc > 100) {
+           setErrorMsg('Akurasi GPS terlalu rendah (±' + Math.round(acc) + 'm). Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik.');
+           setScanStep('invalid');
+           return;
+        }
+
         const office = Array.isArray(profile?.offices) ? profile?.offices[0] : profile?.offices;
         if (office && office.latitude && office.longitude && office.radius) {
            const dist = calculateDistance(lat, lng, office.latitude, office.longitude);

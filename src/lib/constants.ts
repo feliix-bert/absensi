@@ -6,14 +6,7 @@ export const APP_NAME = 'TelIntern';
 export const APP_TAGLINE = 'Smart Internship Attendance';
 export const APP_VERSION = '1.0.0';
 
-// Office location mock (Telkom Indonesia HQ - Jakarta)
-export const MOCK_OFFICE = {
-  name: 'Telkom Indonesia — Gedung Graha Merah Putih',
-  address: 'Jl. Jenderal Gatot Subroto No.Kav. 52, Jakarta Selatan',
-  latitude: -6.229690,
-  longitude: 106.820860,
-  radius: 150, // meters
-};
+
 
 // Attendance timing rules
 export const ATTENDANCE_RULES = {
@@ -25,19 +18,7 @@ export const ATTENDANCE_RULES = {
   workingDays: [1, 2, 3, 4, 5], // Mon-Fri (0=Sun, 6=Sat)
 };
 
-// Divisions list
-export const DIVISIONS = [
-  'Digital & IT',
-  'Customer Experience',
-  'Human Capital',
-  'Finance & Strategy',
-  'Network & Infrastructure',
-  'Marketing & Communication',
-  'Legal & Compliance',
-  'Enterprise Business',
-  'Consumer Business',
-  'Wholesale & International',
-];
+
 
 // Routes
 export const ROUTES = {

@@ -20,7 +20,6 @@ export function ProfileSummary({ profile }: { profile: any }) {
 
         <dl className="space-y-4 pt-4">
           {[
-            { icon: Briefcase, label: 'Divisi', value: profile.divisi },
             { icon: GraduationCap, label: 'Pembimbing', value: profile.pembimbing },
             { icon: MapPin, label: 'Kantor', value: profile.offices?.nama || '-' },
           ].map((row) => (

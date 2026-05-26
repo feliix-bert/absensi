@@ -17,7 +17,6 @@ CREATE TABLE profiles (
     id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
     nama VARCHAR,
     nim VARCHAR,
-    divisi VARCHAR,
     pembimbing VARCHAR,
     durasi_magang VARCHAR,
     lokasi_kantor UUID REFERENCES offices(id),
@@ -78,12 +77,11 @@ CREATE POLICY "Users can update their own attendance."
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, nama, nim, divisi, pembimbing, durasi_magang)
+  INSERT INTO public.profiles (id, nama, nim, pembimbing, durasi_magang)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'nama',
     new.raw_user_meta_data->>'nim',
-    new.raw_user_meta_data->>'divisi',
     new.raw_user_meta_data->>'pembimbing',
     new.raw_user_meta_data->>'durasi_magang'
   );

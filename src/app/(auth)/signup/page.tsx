@@ -5,7 +5,6 @@ import { useState, useActionState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, ChevronRight, ChevronLeft, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DIVISIONS } from '@/lib/constants';
 import { AuthPromoPanel } from '@/components/auth/AuthPromoPanel';
 import { signUp } from '@/actions/auth.actions';
 import { createClient } from '@/utils/supabase/client';
@@ -13,13 +12,13 @@ import { createClient } from '@/utils/supabase/client';
 type Step = 1 | 2;
 
 interface FormData {
-  name: string; nim: string; division: string; mentor: string;
+  name: string; nim: string; mentor: string;
   startDate: string; endDate: string;
   email: string; password: string; confirmPassword: string;
 }
 
 const EMPTY_FORM: FormData = {
-  name: '', nim: '', division: '', mentor: '',
+  name: '', nim: '', mentor: '',
   startDate: '', endDate: '',
   email: '', password: '', confirmPassword: '',
 };
@@ -88,7 +87,6 @@ export default function SignupPage() {
     const errs: Partial<FormData> = {};
     if (!form.name.trim()) errs.name = 'Nama wajib diisi';
     if (!form.nim.trim()) errs.nim = 'NIM / ID Magang wajib diisi';
-    if (!form.division) errs.division = 'Pilih divisi';
     if (!form.mentor.trim()) errs.mentor = 'Nama pembimbing wajib diisi';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -178,12 +176,7 @@ export default function SignupPage() {
                   <Field id="signup-nim" label="NIM / NIS / ID Magang" error={errors.nim}>
                     <input id="signup-nim" type="text" placeholder="Contoh: 1301213456" value={form.nim} onChange={set('nim')} className={cn('input', errors.nim && 'input-error')} />
                   </Field>
-                  <Field id="signup-division" label="Divisi" error={errors.division}>
-                    <select id="signup-division" value={form.division} onChange={set('division')} className={cn('input', errors.division && 'input-error')}>
-                      <option value="">Pilih divisi...</option>
-                      {DIVISIONS.map((d) => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                  </Field>
+
                   <Field id="signup-mentor" label="Nama Pembimbing" error={errors.mentor}>
                     <input id="signup-mentor" type="text" placeholder="Nama pembimbing lapangan" value={form.mentor} onChange={set('mentor')} className={cn('input', errors.mentor && 'input-error')} />
                   </Field>
@@ -215,7 +208,6 @@ export default function SignupPage() {
                   {/* Hidden inputs for Step 1 data */}
                   <input type="hidden" name="nama" value={form.name} />
                   <input type="hidden" name="nim" value={form.nim} />
-                  <input type="hidden" name="divisi" value={form.division} />
                   <input type="hidden" name="pembimbing" value={form.mentor} />
                   
                   <div className="grid grid-cols-2 gap-3">

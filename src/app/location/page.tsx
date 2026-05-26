@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn, formatDistance } from '@/lib/utils';
-import { MOCK_OFFICE } from '@/lib/constants';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import type { LocationStatus } from '@/lib/types';
 import { useLocation } from '@/hooks/useLocation';
 
@@ -22,7 +22,7 @@ const DEMO_STATES: { key: DemoState; label: string }[] = [
   { key: 'denied', label: 'Ditolak' },
 ];
 
-function RequestingState({ onAllow }: { onAllow: () => void }) {
+function RequestingState({ onAllow, office }: { onAllow: () => void, office: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -45,9 +45,9 @@ function RequestingState({ onAllow }: { onAllow: () => void }) {
       </p>
       <div className="card p-4 mb-6 w-full max-w-sm text-left">
         <p className="text-label-sm text-neutral-500 mb-1 uppercase tracking-wide">Lokasi Kantor</p>
-        <p className="text-body-md font-semibold text-neutral-900">{MOCK_OFFICE.name}</p>
-        <p className="text-body-sm text-neutral-500 mt-0.5">{MOCK_OFFICE.address}</p>
-        <p className="text-body-sm text-neutral-400 mt-1">Radius: {MOCK_OFFICE.radius} meter</p>
+        <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Kantor'}</p>
+        <p className="text-body-sm text-neutral-500 mt-0.5">Kantor Cabang</p>
+        <p className="text-body-sm text-neutral-400 mt-1">Radius: {office?.radius || 150} meter</p>
       </div>
       <button onClick={onAllow} className="btn btn-primary btn-lg btn-full max-w-sm">
         <MapPin size={18} /> Izinkan Akses Lokasi
@@ -93,7 +93,7 @@ function LoadingState() {
   );
 }
 
-function InsideState({ distance }: { distance: number }) {
+function InsideState({ distance, office }: { distance: number, office: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -113,7 +113,7 @@ function InsideState({ distance }: { distance: number }) {
       </motion.div>
       <h2 className="text-heading-xl text-success-700 mb-2">Anda di dalam radius!</h2>
       <p className="text-body-md text-neutral-500 mb-6">
-        Lokasi terdeteksi {formatDistance(distance)} dari kantor — dalam radius {MOCK_OFFICE.radius}m
+        Lokasi terdeteksi {formatDistance(distance)} dari kantor — dalam radius {office?.radius || 150}m
       </p>
       <div className="card p-4 w-full max-w-sm mb-6">
         <div className="flex items-center gap-3">
@@ -121,8 +121,8 @@ function InsideState({ distance }: { distance: number }) {
             <MapPin size={18} className="text-success-600" />
           </div>
           <div className="text-left">
-            <p className="text-body-md font-semibold text-neutral-900">{MOCK_OFFICE.name.split('—')[1]?.trim()}</p>
-            <p className="text-body-sm text-neutral-500">GPS aktif · Akurasi ±10m</p>
+            <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Kantor'}</p>
+            <p className="text-body-sm text-neutral-500">GPS aktif · Akurasi tinggi</p>
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ function InsideState({ distance }: { distance: number }) {
   );
 }
 
-function OutsideState({ distance, onRefresh }: { distance: number; onRefresh: () => void }) {
+function OutsideState({ distance, onRefresh, office }: { distance: number; onRefresh: () => void, office: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -146,7 +146,7 @@ function OutsideState({ distance, onRefresh }: { distance: number; onRefresh: ()
       <h2 className="text-heading-xl text-warning-700 mb-2">Di luar area kantor</h2>
       <p className="text-body-md text-neutral-500 mb-6">
         Kamu berada ±{formatDistance(distance)} dari kantor.<br />
-        Perlu dalam radius {MOCK_OFFICE.radius}m untuk absen.
+        Perlu dalam radius {office?.radius || 150}m untuk absen.
       </p>
       <div className="card p-4 w-full max-w-sm mb-6 border-warning-200 bg-warning-50">
         <div className="flex items-start gap-3">
@@ -223,6 +223,8 @@ function DeniedState() {
 export default function LocationPage() {
   const { data, requestPermission, setDemoState, refresh } = useLocation();
   const state = (data.status === 'idle' ? 'requesting' : data.status) as DemoState;
+  const profile = useAuthStore(state => state.profile);
+  const office = Array.isArray(profile?.offices) ? profile?.offices[0] : profile?.offices;
 
   const handleAllow = () => {
     void requestPermission();
@@ -261,11 +263,11 @@ export default function LocationPage() {
       <div className="max-w-md mx-auto px-5 py-6">
         <AnimatePresence mode="wait">
           <motion.div key={state}>
-            {state === 'requesting' && <RequestingState onAllow={handleAllow} />}
+            {state === 'requesting' && <RequestingState onAllow={handleAllow} office={office} />}
             {state === 'loading' && <LoadingState />}
-            {state === 'inside' && <InsideState distance={data.distance ?? 45} />}
+            {state === 'inside' && <InsideState distance={data.distance ?? 45} office={office} />}
             {state === 'outside' && (
-              <OutsideState distance={data.distance ?? 430} onRefresh={() => void refresh()} />
+              <OutsideState distance={data.distance ?? 430} onRefresh={() => void refresh()} office={office} />
             )}
             {state === 'low_accuracy' && <LowAccuracyState onRetry={() => void refresh()} />}
             {state === 'denied' && <DeniedState />}

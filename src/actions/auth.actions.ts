@@ -8,7 +8,6 @@ import { z } from 'zod'
 const signUpSchema = z.object({
   nama: z.string().min(2, 'Nama minimal 2 karakter'),
   nim: z.string().min(3, 'NIM/NIS/ID Magang minimal 3 karakter'),
-  divisi: z.string().min(2, 'Divisi minimal 2 karakter'),
   pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
   mulai_magang: z.string().min(1, 'Tanggal mulai harus diisi'),
   selesai_magang: z.string().min(1, 'Tanggal selesai harus diisi'),
@@ -19,7 +18,6 @@ const signUpSchema = z.object({
 const updateProfileSchema = z.object({
   nama: z.string().min(2, 'Nama minimal 2 karakter'),
   nim: z.string().min(3, 'NIM/NIS/ID Magang minimal 3 karakter'),
-  divisi: z.string().min(2, 'Divisi minimal 2 karakter'),
   pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
   mulai_magang: z.string().min(1, 'Tanggal mulai harus diisi'),
   selesai_magang: z.string().min(1, 'Tanggal selesai harus diisi'),

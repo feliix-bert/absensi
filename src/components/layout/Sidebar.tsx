@@ -150,7 +150,6 @@ export function Sidebar() {
             className="overflow-hidden whitespace-nowrap min-w-0"
           >
             <p className="text-body-sm font-medium text-neutral-900 truncate">{profile?.nama || 'User'}</p>
-            <p className="text-[11px] text-neutral-400 truncate">{profile?.divisi || '-'}</p>
           </motion.div>
         </div>
       </div>

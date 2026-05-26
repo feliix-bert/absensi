@@ -7,7 +7,6 @@ export const MOCK_USER: User = {
   id: 'intern-001',
   name: 'Yohana Putri Maharani',
   nim: '1301213456',
-  division: 'Digital & IT',
   mentor: 'Bpk. Reza Firmansyah, S.T., M.Kom.',
   startDate: '2025-03-01',
   endDate: '2025-08-31',
