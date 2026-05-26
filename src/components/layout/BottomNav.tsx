@@ -19,14 +19,17 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { unreadCount, fetchNotifications } = useNotifications();
-  const profile = useAuthStore((state) => state.profile);
+  const { unreadCount, fetchNotifications, initRealtime } = useNotifications();
+  const { profile, user } = useAuthStore();
 
   useEffect(() => {
     if (profile) {
       fetchNotifications();
     }
-  }, [fetchNotifications, profile]);
+    if (user?.id) {
+      initRealtime(user.id);
+    }
+  }, [fetchNotifications, initRealtime, profile, user?.id]);
 
   return (
     <nav

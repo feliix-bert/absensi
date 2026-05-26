@@ -33,12 +33,15 @@ const SIDEBAR_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const { unreadCount, fetchNotifications } = useNotifications();
-  const profile = useAuthStore((state) => state.profile);
+  const { unreadCount, fetchNotifications, initRealtime } = useNotifications();
+  const { profile, user } = useAuthStore();
 
   useEffect(() => {
     fetchNotifications();
-  }, [fetchNotifications]);
+    if (user?.id) {
+      initRealtime(user.id);
+    }
+  }, [fetchNotifications, initRealtime, user?.id]);
 
   return (
     <motion.aside

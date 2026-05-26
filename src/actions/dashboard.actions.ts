@@ -1,16 +1,17 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { startOfMonth, endOfMonth, startOfDay, endOfDay, subDays } from 'date-fns'
+import { subDays } from 'date-fns'
+import { getWibTodayStart, getWibTodayEnd, getWibMonthStart, getWibMonthEnd } from '@/lib/date.utils'
 
 export async function getDashboardStats(userId: string) {
   const supabase = await createClient()
 
-  // Prepare dates
-  const todayStart = startOfDay(new Date()).toISOString()
-  const todayEnd = endOfDay(new Date()).toISOString()
-  const monthStart = startOfMonth(new Date()).toISOString()
-  const monthEnd = endOfMonth(new Date()).toISOString()
+  // Prepare dates in WIB
+  const todayStart = getWibTodayStart()
+  const todayEnd = getWibTodayEnd()
+  const monthStart = getWibMonthStart()
+  const monthEnd = getWibMonthEnd()
 
   // 1. Fetch all required data concurrently
   const [
@@ -34,7 +35,7 @@ export async function getDashboardStats(userId: string) {
   // Calculate dynamic Alpha days (past weekdays without attendance)
   let calculatedAlphaDays = 0;
   const startCalcDate = profile?.mulai_magang ? new Date(Math.max(new Date(profile.mulai_magang).getTime(), new Date(monthStart).getTime())) : new Date(monthStart);
-  const endCalcDate = subDays(startOfDay(new Date()), 1); // Up to yesterday
+  const endCalcDate = subDays(new Date(todayStart), 1); // Up to yesterday in WIB
   
   if (startCalcDate <= endCalcDate) {
     let curr = new Date(startCalcDate);
@@ -61,8 +62,8 @@ export async function getDashboardStats(userId: string) {
   // This is a simplified O(N) backward check.
   for (let i = 0; i < 30; i++) {
     const checkDate = subDays(currentDate, i)
-    const start = startOfDay(checkDate).toISOString()
-    const end = endOfDay(checkDate).toISOString()
+    const start = getWibTodayStart(checkDate)
+    const end = getWibTodayEnd(checkDate)
     const hasAttended = records.some(r => r.check_in >= start && r.check_in <= end && (r.status === 'Hadir' || r.status === 'Terlambat'))
     
     // Ignore today if hasn't attended yet, don't break the streak

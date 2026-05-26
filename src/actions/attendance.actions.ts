@@ -3,8 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { calculateDistance } from '@/features/attendance/utils/geo.utils'
 import { validateStaticQR } from '@/features/attendance/services/qr.service'
-import { startOfDay, endOfDay } from 'date-fns'
-
+import { getWibTodayStart, getWibTodayEnd, getWibCurrentHour, getWibMonthBoundaries } from '@/lib/date.utils'
 interface AttendancePayload {
   latitude: number
   longitude: number
@@ -57,9 +56,9 @@ export async function submitCheckIn(payload: AttendancePayload) {
     return { error: 'Akurasi GPS terlalu rendah. Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik.' }
   }
 
-  // 5. Prevent Duplicate Check-In for Today
-  const todayStart = startOfDay(new Date()).toISOString()
-  const todayEnd = endOfDay(new Date()).toISOString()
+  // 5. Prevent Duplicate Check-In for Today (WIB boundaries)
+  const todayStart = getWibTodayStart()
+  const todayEnd = getWibTodayEnd()
 
   const { data: existingAttendance } = await supabase
     .from('attendance')
@@ -97,7 +96,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
       latitude: payload.latitude,
       longitude: payload.longitude,
       accuracy: payload.accuracy,
-      status: new Date().getHours() >= 9 ? 'Terlambat' : 'Hadir',
+      status: getWibCurrentHour() >= 9 ? 'Terlambat' : 'Hadir',
       qr_token: payload.qrToken
     })
 
@@ -114,10 +113,8 @@ export async function getAttendanceHistory(monthYyyyMm: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  // Calculate start and end of the requested month
-  const [year, month] = monthYyyyMm.split('-').map(Number)
-  const startDate = new Date(year, month - 1, 1).toISOString()
-  const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString()
+  // Calculate start and end of the requested month in WIB
+  const { startDate, endDate } = getWibMonthBoundaries(monthYyyyMm)
 
   const { data } = await supabase
     .from('attendance')
@@ -135,9 +132,9 @@ export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: stri
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  // Prevent Duplicate Izin for Today
-  const todayStart = startOfDay(new Date()).toISOString()
-  const todayEnd = endOfDay(new Date()).toISOString()
+  // Prevent Duplicate Izin for Today (WIB boundaries)
+  const todayStart = getWibTodayStart()
+  const todayEnd = getWibTodayEnd()
 
   const { data: existingAttendance } = await supabase
     .from('attendance')
