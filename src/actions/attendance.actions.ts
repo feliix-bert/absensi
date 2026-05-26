@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { calculateDistance } from '@/features/attendance/utils/geo.utils'
 import { validateStaticQR } from '@/features/attendance/services/qr.service'
 import { getWibTodayStart, getWibTodayEnd, getWibCurrentHour, getWibMonthBoundaries } from '@/lib/date.utils'
+import { revalidatePath } from 'next/cache'
+
 interface AttendancePayload {
   latitude: number
   longitude: number
@@ -34,10 +36,11 @@ export async function submitCheckIn(payload: AttendancePayload) {
     .single()
 
   if (profileError || !profile || !profile.offices) {
+    console.error('Profile fetch error:', profileError)
     return { error: 'Lokasi kantor belum disetting untuk profil Anda. Harap hubungi admin.' }
   }
 
-  // @ts-ignore - Supabase type inference for joined tables can be tricky sometimes
+  // @ts-ignore - Supabase type inference for joined tables
   const office = Array.isArray(profile.offices) ? profile.offices[0] : profile.offices
 
   // 4. Validate Location (Geofencing)
@@ -60,33 +63,43 @@ export async function submitCheckIn(payload: AttendancePayload) {
   const todayStart = getWibTodayStart()
   const todayEnd = getWibTodayEnd()
 
-  const { data: existingAttendance } = await supabase
+  const { data: existingAttendance, error: findError } = await supabase
     .from('attendance')
     .select('id, check_out')
     .eq('user_id', user.id)
     .gte('check_in', todayStart)
     .lte('check_in', todayEnd)
-    .single()
+    .maybeSingle()  // Use maybeSingle to avoid error when no record exists
+
+  if (findError) {
+    console.error('Find existing attendance error:', findError)
+    return { error: 'Gagal memeriksa data absensi hari ini' }
+  }
 
   if (existingAttendance) {
     if (existingAttendance.check_out) {
-      return { error: 'User sudah melakukan absen sebelumnya.' }
+      return { error: 'Anda sudah melakukan absen masuk dan keluar hari ini.' }
     } else {
-      // Check out
+      // Check out — update existing record
       const { error: updateError } = await supabase
         .from('attendance')
         .update({ check_out: new Date().toISOString() })
         .eq('id', existingAttendance.id)
         
       if (updateError) {
-        console.error(updateError)
+        console.error('Check-out update error:', updateError)
         return { error: 'Gagal memproses absen keluar' }
       }
+
+      // Revalidate dashboard and history so next navigation shows fresh data
+      revalidatePath('/dashboard')
+      revalidatePath('/history')
+
       return { success: true, message: 'Absen keluar berhasil', type: 'keluar', time: new Date().toISOString(), office_name: office.nama }
     }
   }
 
-  // 6. Insert Attendance Record
+  // 6. Insert new Attendance Record (Absen Masuk)
   const now = new Date().toISOString()
   const { error: insertError } = await supabase
     .from('attendance')
@@ -101,9 +114,13 @@ export async function submitCheckIn(payload: AttendancePayload) {
     })
 
   if (insertError) {
-    console.error(insertError)
-    return { error: 'Gagal menyimpan absensi' }
+    console.error('Check-in insert error:', insertError)
+    return { error: `Gagal menyimpan absensi: ${insertError.message}` }
   }
+
+  // Revalidate dashboard and history so next navigation shows fresh data
+  revalidatePath('/dashboard')
+  revalidatePath('/history')
 
   return { success: true, message: 'Absensi berhasil', type: 'masuk', time: now, office_name: office.nama }
 }
@@ -116,13 +133,18 @@ export async function getAttendanceHistory(monthYyyyMm: string) {
   // Calculate start and end of the requested month in WIB
   const { startDate, endDate } = getWibMonthBoundaries(monthYyyyMm)
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('attendance')
     .select('*')
     .eq('user_id', user.id)
     .gte('check_in', startDate)
     .lte('check_in', endDate)
     .order('check_in', { ascending: false })
+
+  if (error) {
+    console.error('getAttendanceHistory error:', error)
+    return []
+  }
 
   return data || []
 }
@@ -136,13 +158,18 @@ export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: stri
   const todayStart = getWibTodayStart()
   const todayEnd = getWibTodayEnd()
 
-  const { data: existingAttendance } = await supabase
+  const { data: existingAttendance, error: findError } = await supabase
     .from('attendance')
     .select('id')
     .eq('user_id', user.id)
     .gte('check_in', todayStart)
     .lte('check_in', todayEnd)
-    .single()
+    .maybeSingle()  // Use maybeSingle to avoid PGRST116 error
+
+  if (findError) {
+    console.error('Find existing attendance error:', findError)
+    return { error: 'Gagal memeriksa data absensi hari ini' }
+  }
 
   if (existingAttendance) {
     return { error: 'Anda sudah melakukan absensi hari ini.' }
@@ -155,14 +182,21 @@ export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: stri
       check_in: new Date().toISOString(),
       status: payload.type,
       notes: payload.reason,
-      location: '-', // Explicitly set or let default
-      accuracy: 0,
+      // GPS fields are nullable (no physical location for izin/sakit)
+      latitude: null,
+      longitude: null,
+      accuracy: null,
+      qr_token: null,
     })
 
   if (error) {
-    console.error(error)
-    return { error: 'Gagal mengajukan izin' }
+    console.error('submitIzin insert error:', error)
+    return { error: `Gagal mengajukan izin: ${error.message}` }
   }
+
+  // Revalidate dashboard and history
+  revalidatePath('/dashboard')
+  revalidatePath('/history')
 
   return { success: true, message: `Berhasil mengajukan ${payload.type}` }
 }

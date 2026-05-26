@@ -192,12 +192,12 @@ export default function HistoryPage() {
         <div className="space-y-2.5">
           {filtered.map((record, i) => {
             const date = new Date(record.check_in);
-            const dayName = date.toLocaleDateString('id-ID', { weekday: 'short' });
-            const dayNum = date.getDate();
-            const monthName = date.toLocaleDateString('id-ID', { month: 'short' });
+            const dayName = date.toLocaleDateString('id-ID', { weekday: 'short', timeZone: 'Asia/Jakarta' });
+            const dayNum = date.toLocaleDateString('id-ID', { day: 'numeric', timeZone: 'Asia/Jakarta' });
+            const monthName = date.toLocaleDateString('id-ID', { month: 'short', timeZone: 'Asia/Jakarta' });
             
-            const checkInTime = new Date(record.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            const checkOutTime = record.check_out ? new Date(record.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
+            const checkInTime = new Date(record.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+            const checkOutTime = record.check_out ? new Date(record.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) : null;
 
             return (
               <motion.div
