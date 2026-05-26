@@ -78,7 +78,7 @@ export async function getDashboardStats(userId: string) {
 
   // Calculate attendance rate. (Attended + Late) / (Attended + Late + Alpha)
   const totalRelevant = attendedDays + lateDays + alphaDays
-  const attendanceRate = totalRelevant === 0 ? 100 : Math.round(((attendedDays + lateDays) / totalRelevant) * 100)
+  const attendanceRate = totalRelevant === 0 ? 0 : Math.round(((attendedDays + lateDays) / totalRelevant) * 100)
 
   // Recent activity (last 5)
   const recentActivity = records.slice(0, 5).map(r => ({
