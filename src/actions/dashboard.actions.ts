@@ -82,9 +82,14 @@ export async function getDashboardStats(userId: string) {
   // Recent activity (last 5)
   const recentActivity = records.slice(0, 5).map(r => ({
     id: r.check_in,
+    check_in: r.check_in,  // expose raw timestamp for client-side formatting
     action: r.status === 'Hadir' || r.status === 'Terlambat' ? 'Check In' : r.status,
-    time: new Date(r.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-    location: 'Kantor', // Can pull real location if joined
+    time: new Date(r.check_in).toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Jakarta',  // Fix: always convert to WIB, not server UTC
+    }),
+    location: 'Kantor',
     status: r.status
   }))
 

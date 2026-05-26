@@ -3,7 +3,7 @@
 import { useState, useActionState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  User, Hash, Briefcase, GraduationCap, Calendar,
+  User, Hash, GraduationCap, Calendar,
   MapPin, Mail, LogOut, ChevronRight, Edit3,
   ShieldCheck, Bell, X, Check
 } from 'lucide-react';
@@ -11,7 +11,7 @@ import {
   getInitials, formatDateShort, getInternshipProgress, getRemainingDays, cn
 } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { signOut, updateProfile } from '@/actions/auth.actions';
+import { updateProfile } from '@/actions/auth.actions';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -36,9 +36,25 @@ function InfoRow({ icon: Icon, label, value, className }: InfoRowProps) {
   );
 }
 
+function ProfileSkeleton() {
+  return (
+    <div className="max-w-2xl mx-auto space-y-5 pb-10 animate-pulse">
+      <div className="rounded-2xl bg-secondary-700 p-6 h-48" />
+      <div className="card p-5 h-24" />
+      <div className="card p-5 h-64" />
+    </div>
+  );
+}
+
 export default function ProfilePage() {
-  const profile = useAuthStore((state) => state.profile);
-  const user = useAuthStore((state) => state.user);
+  const storeProfile = useAuthStore((state) => state.profile);
+  const storeUser = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
+
+  // Local state for direct-fetch fallback
+  const [localProfile, setLocalProfile] = useState<any>(null);
+  const [localUser, setLocalUser] = useState<any>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -47,6 +63,32 @@ export default function ProfilePage() {
   
   const [state, formAction, isPending] = useActionState(updateProfile, null);
 
+  // Fallback: if store is done loading but profile is still null, fetch directly
+  useEffect(() => {
+    if (!isLoading && !storeProfile && !isFetching) {
+      setIsFetching(true);
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) { setIsFetching(false); return; }
+        setLocalUser(user);
+        supabase
+          .from('profiles')
+          .select('*, offices(nama, radius, latitude, longitude)')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => {
+            if (data) {
+              setLocalProfile(data);
+              // Also hydrate the store so subsequent navigations are fast
+              useAuthStore.getState().setProfile(data);
+              useAuthStore.getState().setUser(user);
+            }
+            setIsFetching(false);
+          });
+      });
+    }
+  }, [isLoading, storeProfile, isFetching]);
+
   useEffect(() => {
     if (state?.success) {
       setIsEditing(false);
@@ -54,8 +96,13 @@ export default function ProfilePage() {
     }
   }, [state]);
 
-  if (!profile || !user) {
-    return <div className="p-10 text-center text-neutral-500">Memuat profil...</div>;
+  // Use store data first, fall back to directly fetched data
+  const profile = storeProfile || localProfile;
+  const user = storeUser || localUser;
+
+  // Show skeleton while store is initializing OR while doing fallback fetch
+  if (isLoading || isFetching || !profile || !user) {
+    return <ProfileSkeleton />;
   }
 
   const startDate = profile.mulai_magang || new Date().toISOString();

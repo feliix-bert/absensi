@@ -20,7 +20,7 @@ const STATS = (remaining: number, stats: any) => [
   },
   {
     icon: Calendar,
-    label: 'Sisa magang',
+    label: 'Sisa hari magang',
     value: remaining,
     sub: 'hari lagi',
     iconBg: 'bg-primary-50 text-primary-600',
