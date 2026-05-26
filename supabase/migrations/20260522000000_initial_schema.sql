@@ -18,7 +18,8 @@ CREATE TABLE profiles (
     nama VARCHAR,
     nim VARCHAR,
     pembimbing VARCHAR,
-    durasi_magang VARCHAR,
+    mulai_magang VARCHAR,
+    selesai_magang VARCHAR,
     lokasi_kantor UUID REFERENCES offices(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -76,14 +77,21 @@ CREATE POLICY "Users can update their own attendance."
 -- Create a trigger to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+  default_office_id UUID;
 BEGIN
-  INSERT INTO public.profiles (id, nama, nim, pembimbing, durasi_magang)
+  -- Dapatkan ID kantor pertama secara otomatis
+  SELECT id INTO default_office_id FROM public.offices LIMIT 1;
+
+  INSERT INTO public.profiles (id, nama, nim, pembimbing, mulai_magang, selesai_magang, lokasi_kantor)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'nama',
     new.raw_user_meta_data->>'nim',
     new.raw_user_meta_data->>'pembimbing',
-    new.raw_user_meta_data->>'durasi_magang'
+    new.raw_user_meta_data->>'mulai_magang',
+    new.raw_user_meta_data->>'selesai_magang',
+    default_office_id
   );
   RETURN new;
 END;

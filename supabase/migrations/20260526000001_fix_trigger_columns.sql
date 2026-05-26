@@ -1,7 +1,4 @@
--- Remove divisi column from profiles table
-ALTER TABLE profiles DROP COLUMN IF EXISTS divisi;
-
--- Re-create the handle_new_user trigger to exclude divisi
+-- Fix the handle_new_user trigger to match the updated profiles table
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 DECLARE
