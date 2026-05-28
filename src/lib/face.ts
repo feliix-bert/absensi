@@ -16,8 +16,16 @@
  *   - Industry standard for face-api.js applications
  */
 
-import * as faceapi from '@vladmandic/face-api';
+import type * as faceapiType from '@vladmandic/face-api';
 
+let faceapi: typeof faceapiType | null = null;
+
+async function getFaceApi() {
+  if (!faceapi) {
+    faceapi = await import('@vladmandic/face-api');
+  }
+  return faceapi;
+}
 let modelsLoaded = false;
 let loadingPromise: Promise<void> | null = null;
 
@@ -29,10 +37,11 @@ export async function loadFaceModels(): Promise<void> {
   if (loadingPromise) return loadingPromise;
 
   loadingPromise = (async () => {
+    const api = await getFaceApi();
     await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+      api.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      api.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+      api.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
     ]);
     modelsLoaded = true;
   })();
@@ -47,8 +56,9 @@ export async function loadFaceModels(): Promise<void> {
 export async function captureFaceDescriptor(
   videoEl: HTMLVideoElement
 ): Promise<Float32Array | null> {
-  const result = await faceapi
-    .detectSingleFace(videoEl, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.5 }))
+  const api = await getFaceApi();
+  const result = await api
+    .detectSingleFace(videoEl, new api.TinyFaceDetectorOptions({ scoreThreshold: 0.5 }))
     .withFaceLandmarks()
     .withFaceDescriptor();
 
@@ -60,6 +70,7 @@ export async function captureFaceDescriptor(
  * Returns a number in [0, 2]. Values < threshold = same person.
  */
 export function euclideanDistance(a: number[], b: number[]): number {
+  if (!faceapi) throw new Error('face-api not loaded');
   return faceapi.euclideanDistance(a, b);
 }
 
@@ -74,6 +85,7 @@ export function isFaceMatch(
   liveDescriptor: Float32Array,
   storedDescriptor: number[]
 ): boolean {
+  if (!faceapi) throw new Error('face-api not loaded');
   const distance = faceapi.euclideanDistance(
     Array.from(liveDescriptor),
     storedDescriptor
