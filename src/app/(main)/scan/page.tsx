@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, CheckCircle2, XCircle, Clock,
-  RotateCcw, Lightbulb, Info, MapPin
+  RotateCcw, Lightbulb, Info, MapPin, Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { submitCheckIn } from '@/actions/attendance.actions';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { calculateDistance, getHighAccuracyLocation } from '@/features/attendance/utils/geo.utils';
+import { FaceVerificationStep } from '@/components/shared/FaceVerificationStep';
 
 const QRScannerComponent = dynamic(() => import('@/components/shared/QRScannerComponent').then(mod => mod.QRScannerComponent), {
   ssr: false,
@@ -23,7 +24,9 @@ const QRScannerComponent = dynamic(() => import('@/components/shared/QRScannerCo
   )
 });
 
-type ScanStep = 'requesting_location' | 'scanning' | 'processing' | 'success' | 'invalid' | 'expired';
+// face_pending is the new initial gate — must pass before GPS/QR flow starts.
+// All existing states (requesting_location onward) are completely unchanged.
+type ScanStep = 'face_pending' | 'requesting_location' | 'scanning' | 'processing' | 'success' | 'invalid' | 'expired';
 
 // ─── Scanner Frame ───────────────────────────
 function ScanFrame({ active }: { active: boolean }) {
@@ -156,7 +159,8 @@ function ErrorOverlay({ type, message, onRetry }: { type: 'invalid' | 'expired';
 }
 
 export default function ScanPage() {
-  const [scanStep, setScanStep] = useState<ScanStep>('requesting_location');
+  // Face gate is the initial state — GPS/QR flow only starts after face verification.
+  const [scanStep, setScanStep] = useState<ScanStep>('face_pending');
   const [location, setLocation] = useState<{ lat: number; lng: number; acc: number } | null>(null);
   const [torchOn, setTorchOn] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
@@ -164,9 +168,18 @@ export default function ScanPage() {
   const [scanResult, setScanResult] = useState<any>(null);
   
   const profile = useAuthStore(state => state.profile);
+  const isLoading = useAuthStore(state => state.isLoading);
+
+  // Face descriptor from Supabase profiles (null = not enrolled)
+  const faceDescriptor: number[] | null = profile?.face_descriptor ?? null;
   
   // Guard ref to prevent multiple concurrent requests
   const isProcessingScan = useRef(false);
+
+  // Called by FaceVerificationStep on success — transition to GPS flow
+  const handleFaceVerified = () => {
+    setScanStep('requesting_location');
+  };
 
   // 1. Request location on mount
   useEffect(() => {
@@ -243,13 +256,24 @@ export default function ScanPage() {
   const handleRetry = () => {
     isProcessingScan.current = false;
     setScanResult(null);
-    setScanStep('requesting_location');
+    // Reset to face gate so the full security flow runs again
+    setScanStep('face_pending');
     setErrorMsg('');
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-neutral-50 pb-20">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={32} className="animate-spin text-primary-600" />
+          <p className="text-neutral-500 font-medium text-sm">Memuat data profil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-dvh bg-neutral-50 flex flex-col">
+    <div className="min-h-dvh flex flex-col bg-neutral-50 safe-top">
       {/* ─── Header ─── */}
       <header className="relative z-20 flex items-center justify-between px-4 pt-4 pb-2 safe-top">
         <Link
@@ -279,6 +303,15 @@ export default function ScanPage() {
       <div className="flex-1 flex flex-col items-center justify-center relative px-4">
         {/* Scanner */}
         <div className="relative z-10 w-full max-w-sm mx-auto">
+
+          {/* ── FACE GATE — new initial step, camera starts here ── */}
+          {scanStep === 'face_pending' && (
+            <FaceVerificationStep
+              storedDescriptor={faceDescriptor}
+              onVerified={handleFaceVerified}
+            />
+          )}
+
           {scanStep === 'requesting_location' && (
             <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-300 rounded-2xl bg-white shadow-sm">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
@@ -318,7 +351,7 @@ export default function ScanPage() {
       </div>
 
       {/* ─── Bottom Instruction Panel ─── */}
-      {(scanStep === 'requesting_location' || scanStep === 'scanning' || scanStep === 'processing') && (
+      {(scanStep === 'face_pending' || scanStep === 'requesting_location' || scanStep === 'scanning' || scanStep === 'processing') && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -327,17 +360,26 @@ export default function ScanPage() {
           <div className="bg-white shadow-md rounded-2xl p-5 text-center border border-neutral-100">
             <Info size={20} className="text-primary-500 mx-auto mb-3" />
             <h3 className="text-neutral-900 font-bold mb-1.5">
-              {scanStep === 'requesting_location' ? 'Izin Lokasi Diperlukan' :
+              {scanStep === 'face_pending' ? 'Verifikasi Wajah Diperlukan' :
+               scanStep === 'requesting_location' ? 'Izin Lokasi Diperlukan' :
                scanStep === 'processing' ? 'Mengecek...' : 'Arahkan kamera ke QR Code'}
             </h3>
             <p className="text-neutral-500 text-body-sm leading-relaxed">
-              QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.
+              {scanStep === 'face_pending'
+                ? 'Verifikasi wajah diperlukan sebelum absen. Scanner QR akan terbuka setelah wajah dikenali.'
+                : 'QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.'}
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               {scanStep === 'scanning' && (
                 <>
                   <span className="status-dot bg-emerald-500 animate-pulse w-2 h-2 rounded-full" />
-                  <span className="text-emerald-700 font-medium text-[11px]">Lokasi terverifikasi · GPS aktif</span>
+                  <span className="text-emerald-700 font-medium text-[11px]">Wajah terverifikasi · Lokasi terverifikasi · GPS aktif</span>
+                </>
+              )}
+              {scanStep === 'face_pending' && (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-warning-400 animate-pulse" />
+                  <span className="text-warning-700 font-medium text-[11px]">Scanner QR terkunci · Menunggu verifikasi wajah</span>
                 </>
               )}
             </div>

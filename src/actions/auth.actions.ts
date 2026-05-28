@@ -79,7 +79,7 @@ export async function signUp(prevState: any, formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/face-enrollment') // Redirect to face enrollment step after signup
 }
 
 const signInSchema = z.object({

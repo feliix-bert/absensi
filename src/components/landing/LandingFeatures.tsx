@@ -1,80 +1,198 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { MapPin, QrCode, ClipboardList, BarChart3, ArrowUpRight } from 'lucide-react';
+import { MapPin, QrCode, ClipboardList, BarChart3 } from 'lucide-react';
 
+/* ── Each feature gets its own color identity ── */
 const FEATURES = [
   {
+    num: '01',
     icon: MapPin,
     title: 'Validasi Lokasi',
-    desc: 'Pastikan kamu di radius kantor sebelum absen aktif.',
-    tint: 'from-primary-50 to-white',
-    iconWrap: 'bg-primary-600',
+    desc: 'Sistem memverifikasi posisi GPS sebelum absen aktif. Hanya berlaku dalam radius kantor yang sudah dikonfigurasi.',
+    // Brand red tint
+    iconBg: 'bg-primary-600',
+    iconRing: 'ring-primary-100',
+    accentBg: 'bg-primary-50',
+    accentBorder: 'border-primary-100',
+    numColor: 'text-primary-100',
+    topBar: 'bg-primary-500',
+    badge: { label: 'GPS', color: 'bg-primary-100 text-primary-700' },
   },
   {
+    num: '02',
     icon: QrCode,
     title: 'Absen QR Code',
-    desc: 'Scan di area kantor — cepat dan tercatat otomatis.',
-    tint: 'from-secondary-50 to-white',
-    iconWrap: 'bg-secondary-700',
+    desc: 'Scan QR Code di area kantor untuk mencatat kehadiran secara instan — proses kurang dari 3 detik.',
+    // Brand deep blue tint
+    iconBg: 'bg-secondary-700',
+    iconRing: 'ring-secondary-100',
+    accentBg: 'bg-secondary-50',
+    accentBorder: 'border-secondary-100',
+    numColor: 'text-secondary-200',
+    topBar: 'bg-secondary-500',
+    badge: { label: '< 3 detik', color: 'bg-secondary-100 text-secondary-700' },
   },
   {
+    num: '03',
     icon: ClipboardList,
     title: 'Riwayat Absensi',
-    desc: 'Jam masuk, keluar, dan durasi kerja per hari.',
-    tint: 'from-emerald-50 to-white',
-    iconWrap: 'bg-emerald-500',
+    desc: 'Jam masuk, jam keluar, dan durasi kerja tercatat per hari, lengkap dengan filter periode.',
+    // Success / green tint
+    iconBg: 'bg-success-600',
+    iconRing: 'ring-success-100',
+    accentBg: 'bg-success-50',
+    accentBorder: 'border-success-100',
+    numColor: 'text-success-200',
+    topBar: 'bg-success-500',
+    badge: { label: 'Otomatis', color: 'bg-success-100 text-success-700' },
   },
   {
+    num: '04',
     icon: BarChart3,
     title: 'Dashboard Rekap',
-    desc: 'Statistik kehadiran dan progress magang mingguan.',
-    tint: 'from-amber-50 to-white',
-    iconWrap: 'bg-amber-500',
+    desc: 'Statistik kehadiran mingguan dan bulanan dengan persentase kehadiran untuk peserta dan pembimbing.',
+    // Warning / amber tint
+    iconBg: 'bg-warning-500',
+    iconRing: 'ring-warning-100',
+    accentBg: 'bg-warning-50',
+    accentBorder: 'border-warning-100',
+    numColor: 'text-warning-200',
+    topBar: 'bg-warning-500',
+    badge: { label: 'Real-time', color: 'bg-warning-100 text-warning-700' },
   },
+];
+
+const STATS = [
+  { value: '94%', label: 'Tingkat kehadiran rata-rata' },
+  { value: '< 3s', label: 'Proses absen QR' },
+  { value: '2 step', label: 'Setup pertama kali' },
+  { value: '100%', label: 'Berbasis GPS terverifikasi' },
 ];
 
 export function LandingFeatures() {
   return (
-    <section id="fitur" className="section-muted py-20 md:py-24 scroll-mt-20">
-      <div className="page-container">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-          <div className="max-w-xl">
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary-600 mb-3">
-              Fitur
-            </span>
-            <h2 className="text-2xl md:text-[1.75rem] font-bold text-neutral-900 leading-tight">
-              Dibuat untuk alur absensi harian magang
+    <section id="fitur" className="scroll-mt-20 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #F7F9FC 60%, #EEF2F7 100%)' }}>
+
+      {/* Soft structural dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #0E2A47 1px, transparent 0)`,
+          backgroundSize: '36px 36px',
+        }}
+        aria-hidden
+      />
+
+      {/* Top-right red radial wash */}
+      <div
+        className="absolute -top-[30%] -right-[15%] w-[70%] h-[70%] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(204,0,0,0.04) 0%, transparent 65%)' }}
+        aria-hidden
+      />
+      {/* Bottom-left blue radial wash */}
+      <div
+        className="absolute -bottom-[20%] -left-[10%] w-[60%] h-[60%] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(14,42,71,0.05) 0%, transparent 65%)' }}
+        aria-hidden
+      />
+
+      {/* ── STAT STRIP ── */}
+      <div className="border-b border-neutral-200/70 bg-white/60 backdrop-blur-sm">
+        <div className="page-container">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-neutral-200/70">
+            {STATS.map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-20px' }}
+                transition={{ duration: 0.4, delay: i * 0.07 }}
+                className="flex flex-col items-center justify-center py-5 px-4 gap-0.5"
+              >
+                <span className="text-[1.375rem] font-bold text-neutral-900 tabular-nums tracking-tight">{s.value}</span>
+                <span className="text-[0.75rem] text-neutral-500 text-center leading-tight">{s.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="page-container relative py-20 md:py-28">
+
+        {/* ── Section header ── */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+          <div>
+            <div className="inline-flex items-center gap-2.5 mb-4 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary-600" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-600">
+                Fitur
+              </span>
+            </div>
+            <h2 className="text-[1.65rem] md:text-[2rem] font-bold text-neutral-900 leading-tight tracking-[-0.02em]">
+              Dibuat untuk alur<br />absensi harian magang
             </h2>
           </div>
-          <p className="text-neutral-600 text-sm md:text-base max-w-md md:text-right leading-relaxed">
+          <p className="text-neutral-500 text-[0.9375rem] max-w-[340px] md:text-right leading-relaxed">
             Empat modul inti yang saling terhubung — dari validasi lokasi hingga rekap performa.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+        {/* ── Feature cards ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:gap-6">
           {FEATURES.map((f, i) => (
             <motion.article
               key={f.title}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-              className={`group relative overflow-hidden rounded-3xl border border-neutral-200/70 bg-gradient-to-br ${f.tint} p-6 md:p-7 shadow-[0_4px_24px_rgba(14,42,71,0.06)] hover:shadow-[0_12px_40px_rgba(14,42,71,0.1)] transition-shadow duration-300`}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className={`group relative rounded-2xl border overflow-hidden cursor-default transition-all duration-300
+                hover:-translate-y-1 hover:shadow-[0_20px_56px_rgba(14,42,71,0.12)]
+                ${f.accentBg} ${f.accentBorder}
+                shadow-[0_2px_8px_rgba(14,42,71,0.04)]`}
             >
-              <div className="flex items-start justify-between gap-4 mb-5">
-                <div className={`w-12 h-12 rounded-2xl ${f.iconWrap} flex items-center justify-center shadow-lg`}>
-                  <f.icon size={22} className="text-white" />
+              {/* Colored top bar — always visible, not just on hover */}
+              <div className={`absolute top-0 left-0 right-0 h-[3px] ${f.topBar}`} />
+
+              {/* Subtle inner gradient wash */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent pointer-events-none" />
+
+              <div className="relative p-7 md:p-8">
+                {/* Icon + badge row */}
+                <div className="flex items-start justify-between mb-7">
+                  <div className={`w-12 h-12 rounded-xl ${f.iconBg} ring-4 ${f.iconRing} flex items-center justify-center shrink-0
+                    group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 shadow-md`}>
+                    <f.icon size={20} className="text-white" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${f.badge.color}`}>
+                      {f.badge.label}
+                    </span>
+                    <span className={`text-[13px] font-bold tabular-nums ${f.numColor}`}>
+                      {f.num}
+                    </span>
+                  </div>
                 </div>
-                <span className="w-9 h-9 rounded-full bg-white/80 border border-neutral-100 flex items-center justify-center text-neutral-400 group-hover:text-primary-600 group-hover:border-primary-100 transition-colors">
-                  <ArrowUpRight size={16} />
-                </span>
+
+                {/* Content */}
+                <h3 className="text-[1.125rem] font-bold text-neutral-900 mb-3 tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="text-[0.9375rem] text-neutral-600 leading-relaxed">
+                  {f.desc}
+                </p>
+
+                {/* Bottom arrow indicator */}
+                <div className="mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-1 group-hover:translate-x-0">
+                  <div className={`w-5 h-px ${f.topBar}`} />
+                  <span className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wide">Pelajari</span>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-neutral-900 mb-2">{f.title}</h3>
-              <p className="text-neutral-600 text-sm leading-relaxed">{f.desc}</p>
             </motion.article>
           ))}
         </div>
+
       </div>
     </section>
   );

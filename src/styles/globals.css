@@ -144,6 +144,27 @@
     @apply btn h-12 px-6 text-base rounded-lg bg-primary-600 text-white font-semibold shadow-lg shadow-primary-900/25 hover:bg-primary-500;
   }
 
+  /* ─── Hero editorial CTA buttons ─── */
+  .hero-cta-primary {
+    @apply inline-flex items-center gap-2.5 h-12 px-6 rounded-lg bg-primary-600 text-white text-[0.9375rem] font-semibold
+           shadow-[0_4px_20px_rgba(204,0,0,0.35)] hover:bg-primary-500
+           active:scale-[0.97] transition-all duration-200 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-secondary-900;
+  }
+
+  .hero-cta-ghost {
+    @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg
+           border border-white/20 bg-white/[0.06] text-white/80 text-[0.9375rem] font-medium
+           hover:bg-white/[0.12] hover:border-white/30 hover:text-white
+           active:scale-[0.97] transition-all duration-200 backdrop-blur-sm
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30;
+  }
+
+  /* ─── Hero accent text ─── */
+  .hero-text-accent {
+    color: #FF4D4D;
+  }
+
   .btn-danger {
     @apply btn bg-danger-500 text-white hover:bg-danger-600;
   }
@@ -251,7 +272,107 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400;
   }
 
-  /* Landing hero mesh */
+  /* ─── Hero V2 Background ─── */
+  /*
+    A single clean directional gradient — identical navy palette to the
+    existing brand, but now paired with a structural grid overlay div
+    that gives the background spatial grounding without decorative blobs.
+  */
+  .hero-v2-bg {
+    background: linear-gradient(
+      162deg,
+      #071929 0%,
+      #0A2239 42%,
+      #0E2A47 75%,
+      #0F2C4A 100%
+    );
+  }
+
+  /* Very subtle structural grid — gives the dark space a floor without
+     feeling like a decorative pattern. 2.2% opacity is intentional. */
+  .hero-grid-overlay {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* ─── Hero Status Pill (eyebrow chip) ─── */
+  .hero-status-pill {
+    @apply inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full
+           text-[11.5px] font-semibold tracking-wide text-white/55
+           border border-white/[0.1] bg-white/[0.05];
+  }
+
+  /* ─── Hero headline accent — underline instead of color trick ─── */
+  .hero-headline-accent {
+    color: #ffffff;
+    text-decoration: underline;
+    text-decoration-color: #CC0000;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+
+  /* ─── Editorial product frame ─── */
+  /*
+    The frame wraps HeroPreview and gives it a "product screenshot"
+    quality — like a polished dashboard running inside a clean container.
+    Uses layered box-shadow for depth without any glow blob.
+  */
+  .hero-editorial-frame {
+    @apply rounded-[1.75rem] overflow-hidden;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: rgba(9, 28, 48, 0.7);
+    backdrop-filter: blur(2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 40px 100px rgba(6, 24, 40, 0.65),
+      0 12px 32px rgba(6, 24, 40, 0.35);
+  }
+
+  /* Chrome bar — browser-like header strip inside the frame */
+  .hero-frame-bar {
+    @apply flex items-center justify-between px-5 py-3 border-b;
+    border-color: rgba(255, 255, 255, 0.07);
+    background: rgba(7, 22, 38, 0.55);
+  }
+
+  /* ─── Metrics strip ─── */
+  .hero-metrics-strip {
+    @apply flex items-stretch px-5 py-3.5 border-t;
+    border-color: rgba(255, 255, 255, 0.07);
+    background: rgba(6, 22, 38, 0.5);
+  }
+
+  .hero-metric-cell {
+    @apply flex-1 flex flex-col items-center gap-0.5 relative py-0.5;
+  }
+
+  .hero-metric-divider {
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-px h-4;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .hero-metric-value {
+    @apply text-[1.05rem] font-bold text-white tabular-nums;
+  }
+
+  .hero-metric-label {
+    @apply text-[9.5px] font-semibold uppercase tracking-widest;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* ─── Legacy hero classes — kept for non-hero usage ─── */
+  .hero-editorial-bg {
+    background: linear-gradient(
+      160deg,
+      #071929 0%,
+      #0A2239 40%,
+      #0E2A47 72%,
+      #102E50 100%
+    );
+  }
+
   .hero-mesh {
     background:
       radial-gradient(ellipse 80% 60% at 85% 15%, rgba(204, 0, 0, 0.22) 0%, transparent 55%),
