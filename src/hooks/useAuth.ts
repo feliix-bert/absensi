@@ -27,7 +27,7 @@ export function useAuth() {
       setState((s) => ({
         ...s,
         isLoading: false,
-        error: 'Email dan password tidak boleh kosong.',
+        error: 'Email and password cannot be empty.',
       }));
       return false;
     }

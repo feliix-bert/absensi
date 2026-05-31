@@ -33,13 +33,13 @@ export const ROUTES = {
   notifications: '/notifications',
 };
 
-// Status labels in Indonesian
+// Status labels in English
 export const STATUS_LABELS: Record<string, string> = {
-  hadir: 'Hadir',
-  terlambat: 'Terlambat',
-  izin: 'Izin',
-  alpha: 'Alpha',
-  libur: 'Libur',
+  hadir: 'Present',
+  terlambat: 'Late',
+  izin: 'Excused',
+  alpha: 'Absent',
+  libur: 'Holiday',
 };
 
 // Status colors mapping

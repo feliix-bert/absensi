@@ -14,11 +14,11 @@ import { useAuthStore } from '@/features/auth/store/authStore';
 type FilterStatus = 'semua' | AttendanceStatus;
 
 const FILTERS: { key: FilterStatus; label: string }[] = [
-  { key: 'semua', label: 'Semua' },
-  { key: 'hadir', label: 'Hadir' },
-  { key: 'terlambat', label: 'Terlambat' },
-  { key: 'izin', label: 'Izin' },
-  { key: 'alpha', label: 'Alpha' },
+  { key: 'semua', label: 'All' },
+  { key: 'hadir', label: 'Present' },
+  { key: 'terlambat', label: 'Late' },
+  { key: 'izin', label: 'Excused' },
+  { key: 'alpha', label: 'Absent' },
 ];
 
 function formatMonthLabel(ym: string) {
@@ -103,9 +103,9 @@ export default function HistoryPage() {
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-secondary-300 text-body-sm">{activeMonth ? formatMonthLabel(activeMonth) : 'Memuat...'}</p>
+            <p className="text-secondary-300 text-body-sm">{activeMonth ? formatMonthLabel(activeMonth) : 'Loading...'}</p>
             <p className="text-2xl font-bold mt-0.5">
-              {attendedDays} <span className="text-secondary-300 text-lg font-normal">/ {totalDays} hari</span>
+              {attendedDays} <span className="text-secondary-300 text-lg font-normal">/ {totalDays} days</span>
             </p>
           </div>
           <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -122,10 +122,10 @@ export default function HistoryPage() {
         </div>
         <div className="grid grid-cols-4 gap-2 mt-4">
           {[
-            { label: 'Hadir', value: attendedDays, color: 'text-success-400' },
-            { label: 'Telat', value: lateDays, color: 'text-warning-400' },
-            { label: 'Izin', value: izinDays, color: 'text-blue-400' },
-            { label: 'Alpha', value: alphaDays, color: 'text-danger-400' },
+            { label: 'Present', value: attendedDays, color: 'text-success-400' },
+            { label: 'Late', value: lateDays, color: 'text-warning-400' },
+            { label: 'Excused', value: izinDays, color: 'text-blue-400' },
+            { label: 'Absent', value: alphaDays, color: 'text-danger-400' },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
@@ -185,7 +185,7 @@ export default function HistoryPage() {
       </motion.div>
 
       {isLoading ? (
-        <div className="text-center py-10 text-neutral-400">Memuat...</div>
+        <div className="text-center py-10 text-neutral-400">Loading...</div>
       ) : filtered.length === 0 ? (
         <EmptyState variant="history" />
       ) : (
@@ -224,7 +224,7 @@ export default function HistoryPage() {
                       <StatusBadge status={record.status} />
                       {record.isLate && (
                         <span className="text-[10px] text-warning-600 font-medium bg-warning-50 px-2 py-0.5 rounded-full">
-                          Terlambat
+                          Late
                         </span>
                       )}
                     </div>
@@ -233,12 +233,12 @@ export default function HistoryPage() {
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center gap-1.5">
                           <Clock size={12} className="text-success-500" />
-                          <span className="text-body-sm text-neutral-700 font-medium">Masuk: {checkInTime}</span>
+                          <span className="text-body-sm text-neutral-700 font-medium">In: {checkInTime}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock size={12} className="text-neutral-400" />
                           <span className="text-body-sm text-neutral-500">
-                            Keluar: {checkOutTime ?? '—'}
+                            Out: {checkOutTime ?? '—'}
                           </span>
                         </div>
                       </div>
@@ -270,7 +270,7 @@ export default function HistoryPage() {
       {/* Load more */}
       {filtered.length > 0 && (
         <button className="btn btn-outline btn-full btn-md mt-2">
-          <ChevronDown size={16} /> Muat Lebih Banyak
+          <ChevronDown size={16} /> Load More
         </button>
       )}
     </div>

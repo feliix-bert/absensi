@@ -24,7 +24,7 @@ function IzinModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: (
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      setError('Alasan wajib diisi');
+      setError('Reason is required');
       return;
     }
     setIsLoading(true);
@@ -48,34 +48,34 @@ function IzinModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: (
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl"
       >
-        <h2 className="text-xl font-bold text-neutral-900 mb-4">Ajukan Izin / Sakit</h2>
+        <h2 className="text-xl font-bold text-neutral-900 mb-4">Request Leave / Sick</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Tipe</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Type</label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setType('Izin')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${type === 'Izin' ? 'bg-primary-600 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
               >
-                Izin
+                Leave
               </button>
               <button
                 type="button"
                 onClick={() => setType('Sakit')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${type === 'Sakit' ? 'bg-primary-600 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
               >
-                Sakit
+                Sick
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Alasan</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Reason</label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               className="w-full p-3 border border-neutral-200 rounded-xl bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
-              placeholder="Masukkan alasan detail..."
+              placeholder="Enter detailed reason..."
             />
           </div>
           {error && <p className="text-sm text-danger-600 font-medium">{error}</p>}
@@ -86,14 +86,14 @@ function IzinModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: (
               disabled={isLoading}
               className="flex-1 py-2.5 rounded-xl font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 transition-colors"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
               className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-primary-600 hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? 'Mengirim...' : 'Kirim'}
+              {isLoading ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </form>
@@ -103,11 +103,11 @@ function IzinModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: (
 }
 
 export function DashboardToday({ today, profile }: DashboardTodayProps) {
-  const officeShort = profile?.offices?.nama?.split('(')[1]?.replace(')','') ?? 'kantor';
+  const officeShort = profile?.offices?.nama?.split('(')[1]?.replace(')','') ?? 'office';
   const hasCheckedIn = !!today?.check_in;
   const hasCheckedOut = !!today?.check_out;
-  const checkInTime = hasCheckedIn ? new Date(today.check_in).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
-  const checkOutTime = hasCheckedOut ? new Date(today.check_out).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : null;
+  const checkInTime = hasCheckedIn ? new Date(today.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : null;
+  const checkOutTime = hasCheckedOut ? new Date(today.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : null;
 
   const office = Array.isArray(profile?.offices) ? profile?.offices[0] : profile?.offices;
   const [isIzinModalOpen, setIsIzinModalOpen] = useState(false);
@@ -124,14 +124,14 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <CalendarDays size={18} className="text-neutral-400" />
-              <h2 className="text-sm font-semibold text-neutral-800">Absensi Hari Ini</h2>
+              <h2 className="text-sm font-semibold text-neutral-800">Today's Attendance</h2>
             </div>
             {!hasCheckedIn && (
                <button 
                  onClick={() => setIsIzinModalOpen(true)}
                  className="text-xs font-semibold text-primary-600 bg-primary-50 px-2 py-1 rounded-md hover:bg-primary-100 transition-colors"
                >
-                 Ajukan Izin
+                 Request Leave
                </button>
             )}
           </div>
@@ -140,15 +140,15 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
               <StatusBadge status={today.status ?? 'Hadir'} />
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <div className="card-surface p-3">
-                  <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Masuk</p>
+                  <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Check In</p>
                   <p className="text-lg font-bold text-neutral-900 tabular-nums mt-1">
                     {checkInTime ?? '--:--'}
                   </p>
                 </div>
                 <div className="card-surface p-3">
-                  <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Keluar</p>
+                  <p className="text-[10px] font-medium text-neutral-500 uppercase tracking-wide">Check Out</p>
                   <p className={`text-lg font-bold tabular-nums mt-1 ${hasCheckedOut ? 'text-neutral-900' : 'text-amber-600'}`}>
-                    {checkOutTime ?? 'Belum'}
+                    {checkOutTime ?? 'Not yet'}
                   </p>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
           ) : (
             <div className="py-6 text-center">
               <XCircle size={28} className="text-neutral-300 mx-auto mb-2" />
-              <p className="text-sm text-neutral-500">Belum absen masuk hari ini</p>
+              <p className="text-sm text-neutral-500">Haven't checked in today</p>
             </div>
           )}
         </div>
@@ -165,15 +165,15 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={18} className="text-neutral-400" />
-              <h2 className="text-sm font-semibold text-neutral-800">Lokasi</h2>
+              <h2 className="text-sm font-semibold text-neutral-800">Location</h2>
             </div>
             <div className="flex items-start gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
                 <MapPin size={18} className="text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-emerald-800">Lokasi Kantor Anda</p>
-                <p className="text-xs text-neutral-500 mt-0.5">{office?.nama || 'Kantor'}</p>
+                <p className="text-sm font-semibold text-emerald-800">Your Office Location</p>
+                <p className="text-xs text-neutral-500 mt-0.5">{office?.nama || 'Office'}</p>
               </div>
             </div>
           </div>
@@ -189,9 +189,9 @@ export function DashboardToday({ today, profile }: DashboardTodayProps) {
               </div>
               <div>
                 <p className="text-white font-bold">
-                  {hasCheckedIn && !hasCheckedOut ? 'Absen Keluar' : 'Absen Masuk'}
+                  {hasCheckedIn && !hasCheckedOut ? 'Check Out' : 'Check In'}
                 </p>
-                <p className="text-white/75 text-sm mt-0.5">Tap untuk scan QR</p>
+                <p className="text-white/75 text-sm mt-0.5">Tap to scan QR</p>
               </div>
             </div>
             <ChevronRight size={20} className="text-white/70 group-hover:translate-x-0.5 transition-transform" />

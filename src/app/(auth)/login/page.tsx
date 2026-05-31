@@ -20,7 +20,7 @@ export default function LoginPage() {
           href="/"
           className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-800 text-body-md transition-colors"
         >
-          <ArrowLeft size={16} /> Kembali ke Beranda
+          <ArrowLeft size={16} /> Back to Home
         </Link>
       </div>
 
@@ -40,8 +40,8 @@ export default function LoginPage() {
               <div className="w-14 h-14 rounded-2xl bg-primary-600 flex items-center justify-center mb-4 shadow-md">
                 <span className="text-white font-bold text-xl">TI</span>
               </div>
-              <h1 className="text-heading-xl text-neutral-900">Selamat Datang</h1>
-              <p className="text-body-md text-neutral-500 mt-1">Masuk ke akun TelIntern kamu</p>
+              <h1 className="text-heading-xl text-neutral-900">Welcome</h1>
+              <p className="text-body-md text-neutral-500 mt-1">Log in to your TelIntern account</p>
             </div>
 
             {/* Error Alert */}
@@ -84,7 +84,7 @@ export default function LoginPage() {
                     name="password"
                     type={showPass ? 'text' : 'password'}
                     autoComplete="current-password"
-                    placeholder="Masukkan password"
+                    placeholder="Enter password"
                     className={cn('input pr-11', state?.error && 'input-error')}
                     disabled={isPending}
                   />
@@ -92,7 +92,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPass(!showPass)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors p-1"
-                    aria-label={showPass ? 'Sembunyikan password' : 'Tampilkan password'}
+                    aria-label={showPass ? 'Hide password' : 'Show password'}
                   >
                     {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -108,13 +108,13 @@ export default function LoginPage() {
                     type="checkbox"
                     className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                   />
-                  <span className="text-body-sm text-neutral-600">Ingat saya</span>
+                  <span className="text-body-sm text-neutral-600">Remember me</span>
                 </label>
                 <button
                   type="button"
                   className="text-body-sm text-primary-600 hover:text-primary-700 font-medium"
                 >
-                  Lupa password?
+                  Forgot password?
                 </button>
               </div>
 
@@ -128,12 +128,12 @@ export default function LoginPage() {
                 {isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Memverifikasi...
+                    Verifying...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <LogIn size={18} />
-                    Masuk
+                    Login
                   </div>
                 )}
               </button>
@@ -145,7 +145,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-neutral-200" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-white px-3 text-body-sm text-neutral-400">Belum punya akun?</span>
+                <span className="bg-white px-3 text-body-sm text-neutral-400">Don't have an account?</span>
               </div>
             </div>
 
@@ -153,7 +153,7 @@ export default function LoginPage() {
               href="/signup"
               className="btn btn-outline btn-full btn-md text-center justify-center"
             >
-              Daftar sebagai peserta magang
+              Register as an intern
             </Link>
           </motion.div>
           </div>

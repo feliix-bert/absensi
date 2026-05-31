@@ -60,7 +60,7 @@ export function QRScannerComponent({ onScanSuccess, onScanError, torchOn, onTorc
        }, 500);
     }).catch(err => {
       console.error(err);
-      if (onScanError) onScanError(err.message || 'Kamera tidak dapat diakses');
+      if (onScanError) onScanError(err.message || 'Camera cannot be accessed');
     });
 
     return () => {

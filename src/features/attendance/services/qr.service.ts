@@ -3,14 +3,14 @@ export function validateStaticQR(scannedToken: string): { isValid: boolean; reas
   
   if (!expectedToken) {
     console.error('STATIC_QR_TOKEN is not configured in environment variables')
-    return { isValid: false, reason: 'Sistem error: STATIC_QR_TOKEN tidak disetting di server.' }
+    return { isValid: false, reason: 'System error: STATIC_QR_TOKEN is not set on the server.' }
   }
 
   const cleanExpected = expectedToken.trim().replace(/^["']|["']$/g, '');
   const cleanScanned = scannedToken.trim().replace(/^["']|["']$/g, '');
 
   if (cleanScanned !== cleanExpected) {
-    return { isValid: false, reason: `Isi QR Code (${cleanScanned}) tidak sama dengan token server.` }
+    return { isValid: false, reason: `QR Code content (${cleanScanned}) does not match server token.` }
   }
 
   return { isValid: true }

@@ -25,7 +25,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
   // 2. Validate QR Token
   const qrValidation = validateStaticQR(payload.qrToken)
   if (!qrValidation.isValid) {
-    return { error: qrValidation.reason || 'QR Code tidak valid atau kadaluarsa' }
+    return { error: qrValidation.reason || 'Invalid or expired QR Code' }
   }
 
   // 3. Fetch Profile and Office Location
@@ -37,7 +37,7 @@ export async function submitCheckIn(payload: AttendancePayload) {
 
   if (profileError || !profile || !profile.offices) {
     console.error('Profile fetch error:', profileError)
-    return { error: 'Lokasi kantor belum disetting untuk profil Anda. Harap hubungi admin.' }
+    return { error: 'Office location is not set for your profile. Please contact admin.' }
   }
 
   // @ts-ignore - Supabase type inference for joined tables
@@ -52,11 +52,11 @@ export async function submitCheckIn(payload: AttendancePayload) {
   )
 
   if (distance > office.radius) {
-    return { error: `Anda berada di luar area kantor. Jarak Anda: ${Math.round(distance)} meter (Maksimal: ${office.radius} meter)` }
+    return { error: `You are outside the office area. Your distance: ${Math.round(distance)} meters (Maximum: ${office.radius} meters)` }
   }
 
   if (payload.accuracy > 100) {
-    return { error: 'Akurasi GPS terlalu rendah. Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik.' }
+    return { error: 'GPS accuracy is too low. Make sure you are outdoors or have a good GPS signal.' }
   }
 
   // 5. Prevent Duplicate Check-In for Today (WIB boundaries)
@@ -73,16 +73,16 @@ export async function submitCheckIn(payload: AttendancePayload) {
 
   if (findError) {
     console.error('Find existing attendance error:', findError)
-    return { error: 'Gagal memeriksa data absensi hari ini' }
+    return { error: 'Failed to check today\'s attendance data' }
   }
 
   if (existingAttendance) {
     if (existingAttendance.check_out) {
-      return { error: 'Anda sudah melakukan absen masuk dan keluar hari ini.' }
+      return { error: 'You have already checked in and out today.' }
     } else {
       // Check out — update existing record
       if (getWibCurrentHour() < 17) {
-        return { error: 'Absen keluar hanya diizinkan setelah pukul 17:00 WIB.' }
+        return { error: 'Check-out is only allowed after 17:00 WIB.' }
       }
       
       const { error: updateError } = await supabase
@@ -92,14 +92,14 @@ export async function submitCheckIn(payload: AttendancePayload) {
         
       if (updateError) {
         console.error('Check-out update error:', updateError)
-        return { error: 'Gagal memproses absen keluar' }
+        return { error: 'Failed to process check-out' }
       }
 
       // Revalidate dashboard and history so next navigation shows fresh data
       revalidatePath('/dashboard')
       revalidatePath('/history')
 
-      return { success: true, message: 'Absen keluar berhasil', type: 'keluar', time: new Date().toISOString(), office_name: office.nama }
+      return { success: true, message: 'Check-out successful', type: 'keluar', time: new Date().toISOString(), office_name: office.nama }
     }
   }
 
@@ -119,14 +119,14 @@ export async function submitCheckIn(payload: AttendancePayload) {
 
   if (insertError) {
     console.error('Check-in insert error:', insertError)
-    return { error: `Gagal menyimpan absensi: ${insertError.message}` }
+    return { error: `Failed to save attendance: ${insertError.message}` }
   }
 
   // Revalidate dashboard and history so next navigation shows fresh data
   revalidatePath('/dashboard')
   revalidatePath('/history')
 
-  return { success: true, message: 'Absensi berhasil', type: 'masuk', time: now, office_name: office.nama }
+  return { success: true, message: 'Attendance successful', type: 'masuk', time: now, office_name: office.nama }
 }
 
 export async function getAttendanceHistory(monthYyyyMm: string) {
@@ -172,11 +172,11 @@ export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: stri
 
   if (findError) {
     console.error('Find existing attendance error:', findError)
-    return { error: 'Gagal memeriksa data absensi hari ini' }
+    return { error: 'Failed to check today\'s attendance data' }
   }
 
   if (existingAttendance) {
-    return { error: 'Anda sudah melakukan absensi hari ini.' }
+    return { error: 'You have already recorded attendance today.' }
   }
 
   const { error } = await supabase
@@ -195,12 +195,12 @@ export async function submitIzin(payload: { type: 'Izin' | 'Sakit', reason: stri
 
   if (error) {
     console.error('submitIzin insert error:', error)
-    return { error: `Gagal mengajukan izin: ${error.message}` }
+    return { error: `Failed to submit request: ${error.message}` }
   }
 
   // Revalidate dashboard and history
   revalidatePath('/dashboard')
   revalidatePath('/history')
 
-  return { success: true, message: `Berhasil mengajukan ${payload.type}` }
+  return { success: true, message: `Successfully submitted ${payload.type}` }
 }

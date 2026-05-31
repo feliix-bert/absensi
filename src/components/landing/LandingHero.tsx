@@ -29,9 +29,9 @@ const fadeUp = {
 
 /* ─── Metrics for the frame bottom strip ─── */
 const METRICS = [
-  { value: '94%', label: 'Kehadiran' },
-  { value: '< 3s', label: 'Proses' },
-  { value: 'GPS', label: 'Terverifikasi' },
+  { value: '94%', label: 'Attendance' },
+  { value: '< 3s', label: 'Process' },
+  { value: 'GPS', label: 'Verified' },
 ];
 
 export function LandingHero() {
@@ -98,11 +98,11 @@ export function LandingHero() {
               variants={fadeUp}
               className="text-[2.5rem] sm:text-[3rem] lg:text-[3.2rem] xl:text-[3.65rem] font-bold text-white leading-[1.06] tracking-[-0.025em] mb-6 text-balance"
             >
-              Absensi magang<br />
-              yang{' '}
-              <span className="hero-headline-accent">tepat waktu</span>
+              Internship attendance<br />
+              that is{' '}
+              <span className="hero-headline-accent">on time</span>
               <br />
-              &amp; terverifikasi.
+              &amp; verified.
             </motion.h1>
 
             {/* Body copy */}
@@ -110,8 +110,8 @@ export function LandingHero() {
               variants={fadeUp}
               className="text-[1rem] md:text-[1.0625rem] text-white/50 leading-[1.72] max-w-[440px] mx-auto lg:mx-0 mb-10"
             >
-              Catat kehadiran lewat GPS dan QR Code dalam satu alur.
-              Transparan untuk peserta, mudah dipantau pembimbing.
+              Record attendance via GPS and QR Code in one flow.
+              Transparent for interns, easy to monitor for mentors.
             </motion.p>
 
             {/* CTAs */}
@@ -121,7 +121,7 @@ export function LandingHero() {
                 className="hero-cta-primary group"
                 id="hero-cta-signup"
               >
-                <span>Mulai Sekarang</span>
+                <span>Start Now</span>
                 <ArrowRight
                   size={15}
                   className="transition-transform duration-200 group-hover:translate-x-1"
@@ -132,7 +132,7 @@ export function LandingHero() {
                 className="hero-cta-ghost"
                 id="hero-cta-login"
               >
-                Masuk ke akun
+                Log into account
               </Link>
             </motion.div>
 
@@ -140,7 +140,7 @@ export function LandingHero() {
             <motion.div variants={fadeUp} className="flex items-center gap-2.5">
               <CheckCircle2 size={14} className="text-success-400 shrink-0" />
               <p className="text-[0.8125rem] text-white/40 leading-snug">
-                Gratis untuk seluruh peserta magang{' '}
+                Free for all interns of{' '}
                 <span className="text-white/60 font-medium">Telkom Indonesia</span>
               </p>
             </motion.div>
@@ -172,7 +172,7 @@ export function LandingHero() {
                     <div className="w-2.5 h-2.5 rounded-full bg-white/[0.12]" />
                   </div>
                   <span className="text-[11px] font-medium text-white/25 tracking-wide">
-                    TelIntern · Dashboard Peserta
+                    TelIntern · Intern Dashboard
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span

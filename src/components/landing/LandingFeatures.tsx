@@ -8,8 +8,8 @@ const FEATURES = [
   {
     num: '01',
     icon: MapPin,
-    title: 'Validasi Lokasi',
-    desc: 'Sistem memverifikasi posisi GPS sebelum absen aktif. Hanya berlaku dalam radius kantor yang sudah dikonfigurasi.',
+    title: 'Location Validation',
+    desc: 'System verifies GPS position before check-in. Only valid within configured office radius.',
     // Brand red tint
     iconBg: 'bg-primary-600',
     iconRing: 'ring-primary-100',
@@ -22,8 +22,8 @@ const FEATURES = [
   {
     num: '02',
     icon: QrCode,
-    title: 'Absen QR Code',
-    desc: 'Scan QR Code di area kantor untuk mencatat kehadiran secara instan — proses kurang dari 3 detik.',
+    title: 'QR Code Check-in',
+    desc: 'Scan QR Code at the office area to record attendance instantly — takes less than 3 seconds.',
     // Brand deep blue tint
     iconBg: 'bg-secondary-700',
     iconRing: 'ring-secondary-100',
@@ -31,13 +31,13 @@ const FEATURES = [
     accentBorder: 'border-secondary-100',
     numColor: 'text-secondary-200',
     topBar: 'bg-secondary-500',
-    badge: { label: '< 3 detik', color: 'bg-secondary-100 text-secondary-700' },
+    badge: { label: '< 3 seconds', color: 'bg-secondary-100 text-secondary-700' },
   },
   {
     num: '03',
     icon: ClipboardList,
-    title: 'Riwayat Absensi',
-    desc: 'Jam masuk, jam keluar, dan durasi kerja tercatat per hari, lengkap dengan filter periode.',
+    title: 'Attendance History',
+    desc: 'Check-in time, check-out time, and work duration recorded daily, complete with period filters.',
     // Success / green tint
     iconBg: 'bg-success-600',
     iconRing: 'ring-success-100',
@@ -45,13 +45,13 @@ const FEATURES = [
     accentBorder: 'border-success-100',
     numColor: 'text-success-200',
     topBar: 'bg-success-500',
-    badge: { label: 'Otomatis', color: 'bg-success-100 text-success-700' },
+    badge: { label: 'Automatic', color: 'bg-success-100 text-success-700' },
   },
   {
     num: '04',
     icon: BarChart3,
-    title: 'Dashboard Rekap',
-    desc: 'Statistik kehadiran mingguan dan bulanan dengan persentase kehadiran untuk peserta dan pembimbing.',
+    title: 'Recap Dashboard',
+    desc: 'Weekly and monthly attendance statistics with attendance percentage for interns and mentors.',
     // Warning / amber tint
     iconBg: 'bg-warning-500',
     iconRing: 'ring-warning-100',
@@ -64,10 +64,10 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { value: '94%', label: 'Tingkat kehadiran rata-rata' },
-  { value: '< 3s', label: 'Proses absen QR' },
-  { value: '2 step', label: 'Setup pertama kali' },
-  { value: '100%', label: 'Berbasis GPS terverifikasi' },
+  { value: '94%', label: 'Average attendance rate' },
+  { value: '< 3s', label: 'QR check-in process' },
+  { value: '2 step', label: 'First time setup' },
+  { value: '100%', label: 'Verified GPS based' },
 ];
 
 export function LandingFeatures() {
@@ -126,15 +126,15 @@ export function LandingFeatures() {
             <div className="inline-flex items-center gap-2.5 mb-4 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-100">
               <div className="w-1.5 h-1.5 rounded-full bg-primary-600" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-600">
-                Fitur
+                Features
               </span>
             </div>
             <h2 className="text-[1.65rem] md:text-[2rem] font-bold text-neutral-900 leading-tight tracking-[-0.02em]">
-              Dibuat untuk alur<br />absensi harian magang
+              Built for the daily<br />internship attendance flow
             </h2>
           </div>
           <p className="text-neutral-500 text-[0.9375rem] max-w-[340px] md:text-right leading-relaxed">
-            Empat modul inti yang saling terhubung — dari validasi lokasi hingga rekap performa.
+            Four interconnected core modules — from location validation to performance recap.
           </p>
         </div>
 
@@ -186,7 +186,7 @@ export function LandingFeatures() {
                 {/* Bottom arrow indicator */}
                 <div className="mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-1 group-hover:translate-x-0">
                   <div className={`w-5 h-px ${f.topBar}`} />
-                  <span className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wide">Pelajari</span>
+                  <span className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wide">Learn more</span>
                 </div>
               </div>
             </motion.article>

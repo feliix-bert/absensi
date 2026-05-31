@@ -31,7 +31,7 @@ export async function getNotifications() {
   const upcomingReminders = (remindersRes.data || []).map(r => ({
     id: `reminder-${r.id}`, // prefix to avoid id clash
     user_id: r.user_id,
-    title: 'Tenggat Waktu Tugas Mendekat',
+    title: 'Task Deadline Approaching',
     message: r.title,
     type: 'reminder',
     is_read: false,

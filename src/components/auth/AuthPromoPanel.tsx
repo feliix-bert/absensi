@@ -3,9 +3,9 @@
 import { MapPin, QrCode, BarChart3, Shield } from 'lucide-react';
 
 const HIGHLIGHTS = [
-  { icon: MapPin, label: 'GPS radius kantor', value: 'Validasi otomatis' },
-  { icon: QrCode, label: 'Scan QR', value: '< 3 detik' },
-  { icon: BarChart3, label: 'Rekap kehadiran', value: 'Real-time' },
+  { icon: MapPin, label: 'Office GPS radius', value: 'Auto-validation' },
+  { icon: QrCode, label: 'QR Scan', value: '< 3 seconds' },
+  { icon: BarChart3, label: 'Attendance recap', value: 'Real-time' },
 ];
 
 export function AuthPromoPanel({ variant = 'signup' }: { variant?: 'signup' | 'login' }) {
@@ -27,13 +27,13 @@ export function AuthPromoPanel({ variant = 'signup' }: { variant?: 'signup' | 'l
 
         <h2 className="text-[1.65rem] font-bold text-secondary-800 leading-snug mb-3">
           {variant === 'signup'
-            ? 'Kelola absensi magang dengan lebih rapi'
-            : 'Selamat datang kembali'}
+            ? 'Manage your internship attendance neatly'
+            : 'Welcome back'}
         </h2>
         <p className="text-neutral-600 text-sm leading-relaxed mb-8 max-w-sm">
           {variant === 'signup'
-            ? 'Platform absensi berbasis lokasi dan QR untuk peserta magang Telkom — transparan dan mudah dipantau.'
-            : 'Lanjutkan absensi harianmu. Cek lokasi, scan QR, dan pantau riwayat kehadiran.'}
+            ? 'Location and QR-based attendance platform for Telkom interns — transparent and easy to monitor.'
+            : 'Continue your daily attendance. Check location, scan QR, and monitor history.'}
         </p>
 
         {/* Mini metric cards — reference-style stacked cards */}
@@ -59,7 +59,7 @@ export function AuthPromoPanel({ variant = 'signup' }: { variant?: 'signup' | 'l
       <div className="px-9 py-4 bg-secondary-800 flex items-center gap-2">
         <Shield size={16} className="text-primary-400 shrink-0" />
         <p className="text-xs text-white/80">
-          Data kehadiran terenkripsi · Sesuai kebijakan magang Telkom
+          Attendance data is encrypted · Compliant with Telkom internship policies
         </p>
       </div>
     </div>

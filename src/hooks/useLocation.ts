@@ -16,7 +16,7 @@ export function useLocation() {
     accuracy: null,
     distance: null,
     officeRadius: office?.radius || 150,
-    officeName: office?.nama || 'Kantor',
+    officeName: office?.nama || 'Office',
     officeLatitude: office?.latitude || 0,
     officeLongitude: office?.longitude || 0,
   });

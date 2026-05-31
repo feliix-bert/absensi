@@ -19,7 +19,7 @@ const QRScannerComponent = dynamic(() => import('@/components/shared/QRScannerCo
   loading: () => (
     <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-300 rounded-2xl bg-neutral-50 shadow-sm">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-400 mb-4"></div>
-      <p className="text-neutral-500 text-sm font-medium">Memuat scanner...</p>
+      <p className="text-neutral-500 text-sm font-medium">Loading scanner...</p>
     </div>
   )
 });
@@ -97,17 +97,17 @@ function SuccessOverlay({ onDone, result }: { onDone: () => void, result: any })
             transition={{ duration: 0.6, delay: 0.2 }}
           />
         </div>
-        <h2 className="text-2xl font-bold text-neutral-900 mb-2">Absensi Berhasil!</h2>
-        <p className="text-neutral-600 text-body-md mb-2">{result?.type === 'keluar' ? 'Keluar' : 'Masuk'} dicatat pada pukul {timeFormatted}</p>
+        <h2 className="text-2xl font-bold text-neutral-900 mb-2">Attendance Successful!</h2>
+        <p className="text-neutral-600 text-body-md mb-2">{result?.type === 'keluar' ? 'Out' : 'In'} recorded at {timeFormatted}</p>
         <div className="inline-block bg-neutral-100 rounded-full px-4 py-1.5 text-neutral-700 font-medium text-body-sm">
-          {result?.office_name || 'Gedung Kantor'}
+          {result?.office_name || 'Office Building'}
         </div>
         <div className="mt-8 space-y-3 w-72 mx-auto">
           <Link href="/dashboard" className="btn btn-primary btn-full btn-lg flex items-center justify-center gap-2">
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
           <button onClick={onDone} className="btn btn-ghost btn-full flex items-center justify-center gap-2">
-            Scan lagi
+            Scan again
           </button>
         </div>
       </motion.div>
@@ -118,7 +118,7 @@ function SuccessOverlay({ onDone, result }: { onDone: () => void, result: any })
 // ─── Error Overlay ────────────────────────────
 function ErrorOverlay({ type, message, onRetry }: { type: 'invalid' | 'expired'; message?: string; onRetry: () => void }) {
   const isLocationError = message?.toLowerCase().includes('luar area') || message?.toLowerCase().includes('lokasi');
-  const title = isLocationError ? 'Di Luar Area Kantor' : (type === 'invalid' ? 'QR Code Tidak Valid' : 'QR Code Kadaluarsa');
+  const title = isLocationError ? 'Outside Office Area' : (type === 'invalid' ? 'Invalid QR Code' : 'Expired QR Code');
   const Icon = isLocationError ? MapPin : (type === 'invalid' ? XCircle : Clock);
   
   return (
@@ -141,16 +141,16 @@ function ErrorOverlay({ type, message, onRetry }: { type: 'invalid' | 'expired';
         </h2>
         <p className="text-neutral-600 text-body-md mb-6 max-w-sm mx-auto">
           {message || (type === 'invalid'
-            ? 'QR code tidak dikenali. Pastikan kamu scan QR yang benar.'
-            : 'QR code sudah habis masa berlakunya. Minta QR code baru dari admin/sistem.'
+            ? 'QR code not recognized. Make sure you scan the correct QR.'
+            : 'QR code has expired. Request a new QR code from admin/system.'
           )}
         </p>
         <div className="space-y-3 w-64 mx-auto">
           <button onClick={onRetry} className="btn btn-primary btn-full btn-lg flex items-center justify-center gap-2">
-            <RotateCcw size={16} /> Coba Lagi
+            <RotateCcw size={16} /> Try Again
           </button>
           <Link href="/dashboard" className="btn btn-ghost btn-full flex items-center justify-center gap-2">
-            Kembali ke Dashboard
+            Back to Dashboard
           </Link>
         </div>
       </motion.div>
@@ -186,7 +186,7 @@ export default function ScanPage() {
     if (scanStep !== 'requesting_location') return;
 
     if (!navigator.geolocation) {
-      setErrorMsg('Geolocation tidak didukung oleh browser Anda.');
+      setErrorMsg('Geolocation is not supported by your browser.');
       setScanStep('invalid');
       return;
     }
@@ -197,7 +197,7 @@ export default function ScanPage() {
         
         // Location Pre-validation
         if (loc.acc > 100) {
-           setErrorMsg('Akurasi GPS terlalu rendah (±' + Math.round(loc.acc) + 'm). Pastikan Anda berada di luar ruangan atau memiliki sinyal GPS yang baik untuk absensi.');
+           setErrorMsg('GPS accuracy is too low (±' + Math.round(loc.acc) + 'm). Ensure you are outdoors or have a good GPS signal for attendance.');
            setScanStep('invalid');
            return;
         }
@@ -206,7 +206,7 @@ export default function ScanPage() {
         if (office && office.latitude && office.longitude && office.radius) {
            const dist = calculateDistance(loc.lat, loc.lng, office.latitude, office.longitude);
            if (dist > office.radius) {
-              setErrorMsg(`Anda berada di luar area kantor. Jarak Anda: ${Math.round(dist)} meter (Maksimal: ${office.radius} meter)`);
+              setErrorMsg(`You are outside the office area. Distance: ${Math.round(dist)} meters (Maximum: ${office.radius} meters)`);
               setScanStep('invalid');
               return;
            }
@@ -215,7 +215,7 @@ export default function ScanPage() {
         setScanStep('scanning'); // Location granted and valid, move to scanning
       })
       .catch((err) => {
-        setErrorMsg(err.message || 'Izin lokasi ditolak atau gagal. Tolong izinkan akses lokasi untuk bisa absen.');
+        setErrorMsg(err.message || 'Location permission denied or failed. Please allow location access to submit attendance.');
         setScanStep('invalid');
       });
   }, [scanStep, profile]);
@@ -247,7 +247,7 @@ export default function ScanPage() {
       }
     } catch (error) {
       console.error(error);
-      setErrorMsg('Terjadi kesalahan jaringan atau server');
+      setErrorMsg('Network or server error occurred');
       setScanStep('invalid');
       isProcessingScan.current = false;
     }
@@ -266,7 +266,7 @@ export default function ScanPage() {
       <div className="min-h-dvh flex items-center justify-center bg-neutral-50 pb-20">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={32} className="animate-spin text-primary-600" />
-          <p className="text-neutral-500 font-medium text-sm">Memuat data profil...</p>
+          <p className="text-neutral-500 font-medium text-sm">Loading profile data...</p>
         </div>
       </div>
     );
@@ -282,7 +282,7 @@ export default function ScanPage() {
         >
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-neutral-900 font-semibold text-body-lg">Scan QR Absensi</h1>
+        <h1 className="text-neutral-900 font-semibold text-body-lg">Scan Attendance QR</h1>
         <div className="w-10 flex items-center justify-end">
           {torchSupported && (
             <button
@@ -315,8 +315,8 @@ export default function ScanPage() {
           {scanStep === 'requesting_location' && (
             <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-300 rounded-2xl bg-white shadow-sm">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-              <p className="text-neutral-500 text-sm font-medium">Mengunci sinyal GPS...</p>
-              <p className="text-neutral-400 text-xs mt-1">(Dapat memakan waktu beberapa detik)</p>
+              <p className="text-neutral-500 text-sm font-medium">Locking GPS signal...</p>
+              <p className="text-neutral-400 text-xs mt-1">(May take a few seconds)</p>
             </div>
           )}
 
@@ -336,7 +336,7 @@ export default function ScanPage() {
           {scanStep === 'processing' && (
             <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-primary-200 rounded-2xl bg-primary-50 shadow-sm">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-              <p className="text-primary-700 font-semibold">Memverifikasi absen...</p>
+              <p className="text-primary-700 font-semibold">Verifying attendance...</p>
             </div>
           )}
         </div>
@@ -360,26 +360,26 @@ export default function ScanPage() {
           <div className="bg-white shadow-md rounded-2xl p-5 text-center border border-neutral-100">
             <Info size={20} className="text-primary-500 mx-auto mb-3" />
             <h3 className="text-neutral-900 font-bold mb-1.5">
-              {scanStep === 'face_pending' ? 'Verifikasi Wajah Diperlukan' :
-               scanStep === 'requesting_location' ? 'Izin Lokasi Diperlukan' :
-               scanStep === 'processing' ? 'Mengecek...' : 'Arahkan kamera ke QR Code'}
+              {scanStep === 'face_pending' ? 'Face Verification Required' :
+               scanStep === 'requesting_location' ? 'Location Permission Required' :
+               scanStep === 'processing' ? 'Checking...' : 'Point camera at QR Code'}
             </h3>
             <p className="text-neutral-500 text-body-sm leading-relaxed">
               {scanStep === 'face_pending'
-                ? 'Verifikasi wajah diperlukan sebelum absen. Scanner QR akan terbuka setelah wajah dikenali.'
-                : 'QR code tersedia di area resepsionis atau pintu masuk kantor. Pastikan kamu sudah berada di dalam radius kantor.'}
+                ? 'Face verification is required before attendance. QR scanner will open after face is recognized.'
+                : 'QR code is available at the reception or office entrance. Make sure you are inside the office radius.'}
             </p>
             <div className="mt-4 flex items-center justify-center gap-2">
               {scanStep === 'scanning' && (
                 <>
                   <span className="status-dot bg-emerald-500 animate-pulse w-2 h-2 rounded-full" />
-                  <span className="text-emerald-700 font-medium text-[11px]">Wajah terverifikasi · Lokasi terverifikasi · GPS aktif</span>
+                  <span className="text-emerald-700 font-medium text-[11px]">Face verified · Location verified · GPS active</span>
                 </>
               )}
               {scanStep === 'face_pending' && (
                 <>
                   <span className="w-2 h-2 rounded-full bg-warning-400 animate-pulse" />
-                  <span className="text-warning-700 font-medium text-[11px]">Scanner QR terkunci · Menunggu verifikasi wajah</span>
+                  <span className="text-warning-700 font-medium text-[11px]">QR scanner locked · Waiting for face verification</span>
                 </>
               )}
             </div>

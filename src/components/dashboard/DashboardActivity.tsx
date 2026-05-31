@@ -25,28 +25,28 @@ export function DashboardActivity({ recentActivity = [] }: DashboardActivityProp
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-bold text-neutral-900">Aktivitas Terkini</h2>
+        <h2 className="text-base font-bold text-neutral-900">Recent Activity</h2>
         <Link
           href="/history"
           className="text-sm text-primary-600 font-medium hover:underline inline-flex items-center gap-0.5"
         >
-          Semua <ChevronRight size={14} />
+          All <ChevronRight size={14} />
         </Link>
       </div>
       <div className="card-modern divide-y divide-neutral-100 overflow-hidden">
         {recentActivity.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-neutral-400 gap-2">
             <CalendarX size={32} className="opacity-40" />
-            <p className="text-sm">Belum ada aktivitas bulan ini</p>
+            <p className="text-sm">No activity this month</p>
           </div>
         ) : (
           recentActivity.map((record) => {
             const dateObj = new Date(record.check_in);
-            const dayNum = dateObj.toLocaleDateString('id-ID', {
+            const dayNum = dateObj.toLocaleDateString('en-US', {
               day: 'numeric',
               timeZone: 'Asia/Jakarta',
             });
-            const monthStr = dateObj.toLocaleDateString('id-ID', {
+            const monthStr = dateObj.toLocaleDateString('en-US', {
               month: 'short',
               timeZone: 'Asia/Jakarta',
             });
@@ -80,12 +80,12 @@ export function DashboardActivity({ recentActivity = [] }: DashboardActivityProp
                     <div className="flex items-center gap-3 text-xs flex-wrap">
                       <span className="flex items-center gap-1 text-neutral-600">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                        Masuk:&nbsp;<span className="font-semibold tabular-nums">{record.timeIn || '—'}</span>
+                        Check In:&nbsp;<span className="font-semibold tabular-nums">{record.timeIn || '—'}</span>
                       </span>
                       <span className="text-neutral-300">|</span>
                       <span className="flex items-center gap-1 text-neutral-500">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${record.timeOut ? 'bg-amber-400' : 'bg-neutral-300'}`} />
-                        Keluar:&nbsp;
+                        Check Out:&nbsp;
                         <span className={`font-semibold tabular-nums ${record.timeOut ? 'text-neutral-700' : 'text-neutral-400'}`}>
                           {record.timeOut ?? '—'}
                         </span>
@@ -93,10 +93,10 @@ export function DashboardActivity({ recentActivity = [] }: DashboardActivityProp
                     </div>
                   ) : record.status === 'Izin' || record.status === 'Sakit' ? (
                     <p className="text-xs text-neutral-500 italic truncate">
-                      {record.notes ? `Alasan: ${record.notes}` : `Mengajukan ${record.status}`}
+                      {record.notes ? `Reason: ${record.notes}` : `Submitted ${record.status}`}
                     </p>
                   ) : (
-                    <p className="text-xs text-neutral-400">Tanpa keterangan</p>
+                    <p className="text-xs text-neutral-400">No notes</p>
                   )}
                 </div>
               </div>

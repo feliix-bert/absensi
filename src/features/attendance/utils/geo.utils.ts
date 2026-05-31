@@ -78,7 +78,7 @@ export function getHighAccuracyLocation(
       // Usually, we ignore intermediate errors in watchPosition unless it's a critical permission error.
       if (err.code === err.PERMISSION_DENIED) {
         cleanup();
-        reject(new Error('Izin lokasi ditolak'));
+        reject(new Error('Location permission denied'));
       }
     };
 
@@ -93,7 +93,7 @@ export function getHighAccuracyLocation(
       if (bestLocation) {
         resolve(bestLocation);
       } else {
-        reject(new Error('Gagal mendapatkan lokasi akurat dalam waktu yang ditentukan (Timeout)'));
+        reject(new Error('Failed to get accurate location within the specified time (Timeout)'));
       }
     }, timeoutMs);
   });

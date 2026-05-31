@@ -29,16 +29,16 @@ export function DashboardLocationStatus({ office }: { office: any }) {
   return (
     <div className="pt-3 border-t border-neutral-100 mt-auto">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-neutral-500">Status Anda</span>
+        <span className="text-xs font-medium text-neutral-500">Your Status</span>
         {distance === null ? (
-          <span className="text-xs font-semibold text-neutral-400">Menunggu Lokasi...</span>
+          <span className="text-xs font-semibold text-neutral-400">Waiting for Location...</span>
         ) : isInside ? (
           <span className="text-xs font-semibold text-success-600 flex items-center gap-1">
-            <CheckCircle2 size={12} /> Di Dalam Radius (±{distance}m)
+            <CheckCircle2 size={12} /> Inside Radius (±{distance}m)
           </span>
         ) : (
           <span className="text-xs font-semibold text-danger-600 flex items-center gap-1">
-            <XCircle size={12} /> Di Luar Radius (±{distance}m)
+            <XCircle size={12} /> Outside Radius (±{distance}m)
           </span>
         )}
       </div>

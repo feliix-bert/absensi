@@ -10,11 +10,11 @@ import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
-  { id: 'history', label: 'Riwayat', href: '/history', icon: History },
+  { id: 'dashboard', label: 'Home', href: '/dashboard', icon: LayoutDashboard },
+  { id: 'history', label: 'History', href: '/history', icon: History },
   { id: 'scan', label: 'Scan', href: '/scan', icon: QrCode, primary: true },
-  { id: 'notifications', label: 'Notif', href: '/notifications', icon: Bell, badge: true },
-  { id: 'profile', label: 'Profil', href: '/profile', icon: User },
+  { id: 'notifications', label: 'Notifs', href: '/notifications', icon: Bell, badge: true },
+  { id: 'profile', label: 'Profile', href: '/profile', icon: User },
 ];
 
 export function BottomNav() {
@@ -35,7 +35,7 @@ export function BottomNav() {
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 safe-bottom"
       style={{ height: 'var(--bottom-nav-height)' }}
-      aria-label="Navigasi utama"
+      aria-label="Main navigation"
     >
       <div className="flex items-center h-full px-2">
         {NAV_ITEMS.map((tab) => {

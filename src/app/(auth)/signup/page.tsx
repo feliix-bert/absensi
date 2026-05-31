@@ -31,7 +31,7 @@ function PasswordStrength({ password }: { password: string }) {
     /[^A-Za-z0-9]/.test(password),
   ];
   const score = checks.filter(Boolean).length;
-  const labels = ['', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
+  const labels = ['', 'Weak', 'Fair', 'Strong', 'Very Strong'];
   const colors = ['', 'bg-danger-500', 'bg-warning-500', 'bg-success-400', 'bg-success-500'];
 
   if (!password) return null;
@@ -85,20 +85,20 @@ export default function SignupPage() {
 
   const validateStep1 = () => {
     const errs: Partial<FormData> = {};
-    if (!form.name.trim()) errs.name = 'Nama wajib diisi';
-    if (!form.nim.trim()) errs.nim = 'NIM / ID Magang wajib diisi';
-    if (!form.mentor.trim()) errs.mentor = 'Nama pembimbing wajib diisi';
+    if (!form.name.trim()) errs.name = 'Name is required';
+    if (!form.nim.trim()) errs.nim = 'NIM / Intern ID is required';
+    if (!form.mentor.trim()) errs.mentor = 'Mentor name is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
   const validateStep2 = () => {
     const errs: Partial<FormData> = {};
-    if (!form.startDate) errs.startDate = 'Tanggal mulai wajib diisi';
-    if (!form.endDate) errs.endDate = 'Tanggal selesai wajib diisi';
-    if (!form.email.includes('@')) errs.email = 'Email tidak valid';
-    if (form.password.length < 8) errs.password = 'Password minimal 8 karakter';
-    if (form.password !== form.confirmPassword) errs.confirmPassword = 'Password tidak cocok';
+    if (!form.startDate) errs.startDate = 'Start date is required';
+    if (!form.endDate) errs.endDate = 'End date is required';
+    if (!form.email.includes('@')) errs.email = 'Invalid email';
+    if (form.password.length < 8) errs.password = 'Password must be at least 8 characters';
+    if (form.password !== form.confirmPassword) errs.confirmPassword = 'Passwords do not match';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -113,7 +113,7 @@ export default function SignupPage() {
     <div className="min-h-dvh bg-neutral-50 flex flex-col">
       <div className="p-4">
         <Link href="/" className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-800 text-body-md transition-colors">
-          <ArrowLeft size={16} /> Kembali ke Beranda
+          <ArrowLeft size={16} /> Back to Home
         </Link>
       </div>
 
@@ -133,8 +133,8 @@ export default function SignupPage() {
               <div className="w-12 h-12 rounded-xl bg-primary-600 flex items-center justify-center mb-3 shadow-md">
                 <span className="text-white font-bold text-base">TI</span>
               </div>
-              <h1 className="text-heading-xl text-neutral-900">Daftar Magang</h1>
-              <p className="text-body-md text-neutral-500 mt-1">Buat akun TelIntern-mu sekarang</p>
+              <h1 className="text-heading-xl text-neutral-900">Internship Registration</h1>
+              <p className="text-body-md text-neutral-500 mt-1">Create your TelIntern account now</p>
             </div>
 
             {/* Step Indicator */}
@@ -149,7 +149,7 @@ export default function SignupPage() {
                   </div>
                   <div className="flex-1">
                     <p className={cn('text-[11px] font-semibold', s === step ? 'text-primary-600' : 'text-neutral-400')}>
-                      {s === 1 ? 'Data Diri' : 'Akun & Lokasi'}
+                      {s === 1 ? 'Personal Info' : 'Account & Location'}
                     </p>
                   </div>
                   {s < 2 && (
@@ -170,19 +170,19 @@ export default function SignupPage() {
                   transition={{ duration: 0.25 }}
                   className="space-y-4"
                 >
-                  <Field id="signup-name" label="Nama Lengkap" error={errors.name}>
-                    <input id="signup-name" type="text" placeholder="Nama sesuai identitas" value={form.name} onChange={set('name')} className={cn('input', errors.name && 'input-error')} />
+                  <Field id="signup-name" label="Full Name" error={errors.name}>
+                    <input id="signup-name" type="text" placeholder="Name according to ID" value={form.name} onChange={set('name')} className={cn('input', errors.name && 'input-error')} />
                   </Field>
-                  <Field id="signup-nim" label="NIM / NIS / ID Magang" error={errors.nim}>
-                    <input id="signup-nim" type="text" placeholder="Contoh: 1301213456" value={form.nim} onChange={set('nim')} className={cn('input', errors.nim && 'input-error')} />
+                  <Field id="signup-nim" label="NIM / NIS / Intern ID" error={errors.nim}>
+                    <input id="signup-nim" type="text" placeholder="Example: 1301213456" value={form.nim} onChange={set('nim')} className={cn('input', errors.nim && 'input-error')} />
                   </Field>
 
-                  <Field id="signup-mentor" label="Nama Pembimbing" error={errors.mentor}>
-                    <input id="signup-mentor" type="text" placeholder="Nama pembimbing lapangan" value={form.mentor} onChange={set('mentor')} className={cn('input', errors.mentor && 'input-error')} />
+                  <Field id="signup-mentor" label="Mentor Name" error={errors.mentor}>
+                    <input id="signup-mentor" type="text" placeholder="Field mentor name" value={form.mentor} onChange={set('mentor')} className={cn('input', errors.mentor && 'input-error')} />
                   </Field>
 
                   <button onClick={handleNext} className="btn btn-primary btn-full btn-lg mt-2">
-                    Lanjut <ChevronRight size={18} />
+                    Next <ChevronRight size={18} />
                   </button>
                 </motion.div>
               )}
@@ -211,10 +211,10 @@ export default function SignupPage() {
                   <input type="hidden" name="pembimbing" value={form.mentor} />
                   
                   <div className="grid grid-cols-2 gap-3">
-                    <Field id="signup-startdate" label="Tanggal Mulai" error={errors.startDate}>
+                    <Field id="signup-startdate" label="Start Date" error={errors.startDate}>
                       <input id="signup-startdate" name="mulai_magang" type="date" value={form.startDate} onChange={set('startDate')} className={cn('input', errors.startDate && 'input-error')} />
                     </Field>
-                    <Field id="signup-enddate" label="Tanggal Selesai" error={errors.endDate}>
+                    <Field id="signup-enddate" label="End Date" error={errors.endDate}>
                       <input id="signup-enddate" name="selesai_magang" type="date" value={form.endDate} onChange={set('endDate')} className={cn('input', errors.endDate && 'input-error')} />
                     </Field>
                   </div>
@@ -225,7 +225,7 @@ export default function SignupPage() {
 
                   <Field id="signup-password" label="Password" error={errors.password}>
                     <div className="relative">
-                      <input id="signup-password" name="password" type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Minimal 8 karakter" value={form.password} onChange={set('password')} className={cn('input pr-11', errors.password && 'input-error')} />
+                      <input id="signup-password" name="password" type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Minimum 8 characters" value={form.password} onChange={set('password')} className={cn('input pr-11', errors.password && 'input-error')} />
                       <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1">
                         {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -233,9 +233,9 @@ export default function SignupPage() {
                     <PasswordStrength password={form.password} />
                   </Field>
 
-                  <Field id="signup-confirm" label="Konfirmasi Password" error={errors.confirmPassword}>
+                  <Field id="signup-confirm" label="Confirm Password" error={errors.confirmPassword}>
                     <div className="relative">
-                      <input id="signup-confirm" type={showConfirm ? 'text' : 'password'} autoComplete="new-password" placeholder="Ulangi password" value={form.confirmPassword} onChange={set('confirmPassword')} className={cn('input pr-11', errors.confirmPassword && 'input-error')} />
+                      <input id="signup-confirm" type={showConfirm ? 'text' : 'password'} autoComplete="new-password" placeholder="Repeat password" value={form.confirmPassword} onChange={set('confirmPassword')} className={cn('input pr-11', errors.confirmPassword && 'input-error')} />
                       <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1">
                         {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -250,9 +250,9 @@ export default function SignupPage() {
                       {isPending ? (
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Mendaftar...
+                          Registering...
                         </div>
-                      ) : 'Daftar Sekarang'}
+                      ) : 'Register Now'}
                     </button>
                   </div>
                 </motion.form>
@@ -261,9 +261,9 @@ export default function SignupPage() {
 
             {/* Login link */}
             <p className="text-center text-body-sm text-neutral-500 mt-6">
-              Sudah punya akun?{' '}
+              Already have an account?{' '}
               <Link href="/login" className="text-primary-600 font-medium hover:underline">
-                Masuk di sini
+                Login here
               </Link>
             </p>
           </motion.div>

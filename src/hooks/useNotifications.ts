@@ -162,8 +162,8 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
         
         const localNotification: NotificationItem = {
           id: `reminder-local-${reminder.id}`,
-          title: 'Tenggat Waktu Tugas Mendekat',
-          message: `Reminder: ${reminder.title} due at ${new Date(reminder.due_date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`,
+          title: 'Task Deadline Approaching',
+          message: `Reminder: ${reminder.title} due at ${new Date(reminder.due_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
           type: 'reminder',
           is_read: false,
           created_at: new Date().toISOString()

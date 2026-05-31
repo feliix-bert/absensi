@@ -52,7 +52,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 9m',
+    duration: '9h 9m',
   },
   {
     id: 'att-003',
@@ -62,8 +62,8 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'terlambat',
     location: 'Gedung Graha Merah Putih',
     isLate: true,
-    duration: '8j 13m',
-    notes: 'Kemacetan Jakarta Selatan',
+    duration: '8h 13m',
+    notes: 'South Jakarta Traffic',
   },
   {
     id: 'att-004',
@@ -74,7 +74,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     location: '-',
     isLate: false,
     duration: null,
-    notes: 'Libur Nasional — Kenaikan Isa Almasih',
+    notes: 'National Holiday — Ascension of Jesus Christ',
   },
   {
     id: 'att-005',
@@ -85,7 +85,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     location: '-',
     isLate: false,
     duration: null,
-    notes: 'Libur Nasional',
+    notes: 'National Holiday',
   },
   {
     id: 'att-006',
@@ -95,7 +95,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 13m',
+    duration: '9h 13m',
   },
   {
     id: 'att-007',
@@ -105,7 +105,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 5m',
+    duration: '9h 5m',
   },
   {
     id: 'att-008',
@@ -116,7 +116,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     location: '-',
     isLate: false,
     duration: null,
-    notes: 'Sakit — ada surat dokter',
+    notes: 'Sick — doctor\'s note provided',
   },
   {
     id: 'att-009',
@@ -126,7 +126,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 7m',
+    duration: '9h 7m',
   },
   {
     id: 'att-010',
@@ -136,7 +136,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 3m',
+    duration: '9h 3m',
   },
   {
     id: 'att-011',
@@ -146,7 +146,7 @@ export const MOCK_ATTENDANCE_HISTORY: AttendanceRecord[] = [
     status: 'hadir',
     location: 'Gedung Graha Merah Putih',
     isLate: false,
-    duration: '9j 5m',
+    duration: '9h 5m',
   },
   {
     id: 'att-012',
@@ -181,24 +181,24 @@ export const MOCK_STATS: DashboardStats = {
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: 'notif-001',
-    title: 'Jangan lupa absen keluar!',
-    body: 'Kamu belum melakukan absen keluar hari ini. Segera lakukan sebelum pukul 18:00.',
+    title: 'Don\'t forget to check out!',
+    body: 'You haven\'t checked out today. Please do so before 18:00.',
     type: 'warning',
     isRead: false,
     createdAt: new Date().toISOString(),
   },
   {
     id: 'notif-002',
-    title: 'Absensi berhasil dicatat',
-    body: 'Absen masuk hari ini berhasil pada pukul 07:58. Selamat bekerja!',
+    title: 'Attendance recorded successfully',
+    body: 'Today\'s check-in was successful at 07:58. Have a great work day!',
     type: 'success',
     isRead: true,
     createdAt: new Date().toISOString(),
   },
   {
     id: 'notif-003',
-    title: 'Reminder: Evaluasi Mingguan',
-    body: 'Evaluasi mingguan dengan pembimbing Bpk. Reza dijadwalkan hari Jumat pukul 15:00.',
+    title: 'Reminder: Weekly Evaluation',
+    body: 'Weekly evaluation with mentor Mr. Reza is scheduled for Friday at 15:00.',
     type: 'info',
     isRead: true,
     createdAt: '2025-05-20T10:00:00.000Z',

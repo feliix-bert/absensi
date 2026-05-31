@@ -12,10 +12,10 @@ interface EmptyStateProps {
 }
 
 const VARIANTS = {
-  attendance: { icon: ClipboardX, title: 'Belum ada absensi', description: 'Kamu belum melakukan absensi hari ini.' },
-  history: { icon: CalendarX, title: 'Belum ada riwayat', description: 'Riwayat absensimu akan muncul di sini.' },
-  notifications: { icon: BellOff, title: 'Tidak ada notifikasi', description: 'Semua notifikasi sudah dibaca.' },
-  generic: { icon: MapPinOff, title: 'Tidak ada data', description: 'Data tidak tersedia saat ini.' },
+  attendance: { icon: ClipboardX, title: 'No attendance yet', description: 'You haven\'t recorded attendance today.' },
+  history: { icon: CalendarX, title: 'No history yet', description: 'Your attendance history will appear here.' },
+  notifications: { icon: BellOff, title: 'No notifications', description: 'All notifications have been read.' },
+  generic: { icon: MapPinOff, title: 'No data', description: 'Data is currently unavailable.' },
 };
 
 export function EmptyState({ variant = 'generic', title, description, action, className }: EmptyStateProps) {

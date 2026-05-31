@@ -60,10 +60,10 @@ export function HeroPreview() {
         {/* ── Greeting band ── */}
         <div className="px-5 pt-4 pb-3 bg-secondary-900">
           <p className="text-[10px] font-medium text-white/45 uppercase tracking-wider mb-0.5">
-            Selamat pagi
+            Good morning
           </p>
           <p className="text-[18px] font-bold text-white leading-tight">Yohana</p>
-          <p className="text-[10px] text-white/35 mt-1">Kamis, 21 Mei 2025</p>
+          <p className="text-[10px] text-white/35 mt-1">Thursday, 21 May 2025</p>
         </div>
 
         {/* ── Location status ── */}
@@ -72,8 +72,8 @@ export function HeroPreview() {
             <MapPin size={14} className="text-white" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-success-800 leading-tight">Di dalam radius</p>
-            <p className="text-[10px] text-success-600 mt-0.5">± 45 m · GPS aktif</p>
+            <p className="text-[11px] font-semibold text-success-800 leading-tight">Inside radius</p>
+            <p className="text-[10px] text-success-600 mt-0.5">± 45 m · GPS active</p>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ export function HeroPreview() {
           <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
             <div className="flex items-center gap-1.5 mb-2">
               <Clock size={11} className="text-neutral-400" />
-              <span className="text-[10px] text-neutral-500">Masuk</span>
+              <span className="text-[10px] text-neutral-500">Check In</span>
             </div>
             <p className="text-[17px] font-bold text-neutral-900 tabular-nums leading-none">07:58</p>
           </div>
@@ -91,7 +91,7 @@ export function HeroPreview() {
               <CheckCircle2 size={11} className="text-success-500" />
               <span className="text-[10px] text-neutral-500">Status</span>
             </div>
-            <p className="text-[17px] font-bold text-success-600 leading-none">Hadir</p>
+            <p className="text-[17px] font-bold text-success-600 leading-none">Present</p>
           </div>
         </div>
 
@@ -100,9 +100,9 @@ export function HeroPreview() {
 
         {/* ── Progress strip ── */}
         <div className="mx-4 mt-3.5 space-y-2">
-          <StatRow label="Hari ini" value="7 j 42 m" />
-          <StatRow label="Minggu ini" value="94%" accent />
-          <StatRow label="Bulan ini" value="21 / 22 hari" />
+          <StatRow label="Today" value="7 h 42 m" />
+          <StatRow label="This week" value="94%" accent />
+          <StatRow label="This month" value="21 / 22 days" />
         </div>
 
         {/* ── Primary CTA ── */}
@@ -116,8 +116,8 @@ export function HeroPreview() {
                 <QrCode size={16} className="text-white" />
               </div>
               <div className="text-left">
-                <p className="text-[12px] font-bold leading-tight">Absen Sekarang</p>
-                <p className="text-[10px] text-white/60 mt-0.5">Scan QR di kantor</p>
+                <p className="text-[12px] font-bold leading-tight">Check In Now</p>
+                <p className="text-[10px] text-white/60 mt-0.5">Scan QR at office</p>
               </div>
             </div>
             <ChevronRight

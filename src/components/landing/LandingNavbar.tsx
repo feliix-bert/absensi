@@ -6,8 +6,8 @@ import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { label: 'Fitur', href: '#fitur' },
-  { label: 'Cara Kerja', href: '#cara-kerja' },
+  { label: 'Features', href: '#fitur' },
+  { label: 'How it works', href: '#cara-kerja' },
 ];
 
 export function LandingNavbar() {
@@ -53,7 +53,7 @@ export function LandingNavbar() {
                 'hidden sm:block text-[11px] font-medium transition-colors',
                 scrolled ? 'text-neutral-500' : 'text-white/65'
               )}>
-                Absensi Magang Telkom
+                Telkom Internship Attendance
               </span>
             </div>
           </Link>
@@ -92,13 +92,13 @@ export function LandingNavbar() {
                   : 'text-white hover:text-white/90'
               )}
             >
-              Masuk
+              Login
             </Link>
             <Link
               href="/signup"
               className="px-5 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold shadow-md shadow-primary-600/25 hover:bg-primary-500 transition-colors"
             >
-              Daftar Gratis
+              Sign Up Free
             </Link>
           </div>
 
@@ -110,7 +110,7 @@ export function LandingNavbar() {
               'md:hidden w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
               scrolled ? 'text-neutral-700 hover:bg-neutral-100' : 'text-white hover:bg-white/10'
             )}
-            aria-label={menuOpen ? 'Tutup menu' : 'Buka menu'}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -141,14 +141,14 @@ export function LandingNavbar() {
               onClick={() => setMenuOpen(false)}
               className="px-4 py-3 rounded-xl text-neutral-800 font-semibold hover:bg-neutral-50"
             >
-              Masuk
+              Login
             </Link>
             <Link
               href="/signup"
               onClick={() => setMenuOpen(false)}
               className="mx-1 mt-1 py-3.5 rounded-xl bg-primary-600 text-white text-center font-semibold hover:bg-primary-500"
             >
-              Daftar Gratis
+              Sign Up Free
             </Link>
           </nav>
         </div>

@@ -140,13 +140,13 @@ export default function ProfilePage() {
             <h2 className="text-xl font-bold text-white leading-tight">{profile.nama}</h2>
             <p className="text-secondary-300 text-body-sm mt-0.5">{profile.nim}</p>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="badge bg-success-600/20 text-success-400 text-xs">Aktif</span>
+              <span className="badge bg-success-600/20 text-success-400 text-xs">Active</span>
             </div>
           </div>
 
           <button 
             onClick={() => setIsEditing(!isEditing)}
-            aria-label={isEditing ? 'Batal Edit Profil' : 'Edit Profil'}
+            aria-label={isEditing ? 'Cancel Edit Profile' : 'Edit Profile'}
             className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
           >
             {isEditing ? <X size={15} className="text-white" /> : <Edit3 size={15} className="text-white" />}
@@ -157,7 +157,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 gap-3 mt-5 pt-4 border-t border-white/10">
           <div className="text-center">
             <p className="text-lg font-bold text-white">{remaining}</p>
-            <p className="text-[11px] text-secondary-400">Sisa Hari</p>
+            <p className="text-[11px] text-secondary-400">Days Left</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-white">{progress}%</p>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
         className="card p-5"
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-label-lg text-neutral-700">Durasi Magang</span>
+          <span className="text-label-lg text-neutral-700">Internship Duration</span>
           <span className="text-label-lg text-primary-600 font-bold">{progress}%</span>
         </div>
         <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-2">
@@ -186,8 +186,8 @@ export default function ProfilePage() {
           />
         </div>
         <div className="flex justify-between text-[11px] text-neutral-400">
-          <span>Mulai: {formatDateShort(startDate)}</span>
-          <span>Selesai: {formatDateShort(endDate)}</span>
+          <span>Start: {formatDateShort(startDate)}</span>
+          <span>End: {formatDateShort(endDate)}</span>
         </div>
       </motion.div>
 
@@ -199,8 +199,8 @@ export default function ProfilePage() {
         className="card px-5"
       >
         <h3 className="text-label-sm text-neutral-400 uppercase tracking-wide py-3 border-b border-neutral-100 flex justify-between items-center">
-          Informasi Magang
-          {isEditing && <span className="text-primary-600 font-bold">Mode Edit</span>}
+          Internship Information
+          {isEditing && <span className="text-primary-600 font-bold">Edit Mode</span>}
         </h3>
 
         {isEditing ? (
@@ -212,46 +212,46 @@ export default function ProfilePage() {
             )}
             
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-neutral-500 uppercase">Nama Lengkap</label>
+              <label className="text-xs font-semibold text-neutral-500 uppercase">Full Name</label>
               <input name="nama" defaultValue={profile.nama} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-neutral-500 uppercase">NIM / ID Magang</label>
+              <label className="text-xs font-semibold text-neutral-500 uppercase">NIM / Intern ID</label>
               <input name="nim" defaultValue={profile.nim} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-neutral-500 uppercase">Pembimbing</label>
+              <label className="text-xs font-semibold text-neutral-500 uppercase">Mentor</label>
               <input name="pembimbing" defaultValue={profile.pembimbing} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
             </div>
             
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-neutral-500 uppercase">Tanggal Mulai</label>
+                <label className="text-xs font-semibold text-neutral-500 uppercase">Start Date</label>
                 <input type="date" name="mulai_magang" defaultValue={startDate.split('T')[0]} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-neutral-500 uppercase">Tanggal Selesai</label>
+                <label className="text-xs font-semibold text-neutral-500 uppercase">End Date</label>
                 <input type="date" name="selesai_magang" defaultValue={endDate.split('T')[0]} className="w-full px-3 py-2 rounded-lg border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500" required />
               </div>
             </div>
 
             <button type="submit" disabled={isPending} className="w-full py-2.5 mt-4 bg-primary-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition disabled:opacity-50">
-              <Check size={18} /> {isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+              <Check size={18} /> {isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </form>
         ) : (
           <>
-            <InfoRow icon={User} label="Nama Lengkap" value={profile.nama} />
-            <InfoRow icon={Hash} label="NIM / ID Magang" value={profile.nim} />
-            <InfoRow icon={GraduationCap} label="Pembimbing" value={profile.pembimbing} />
+            <InfoRow icon={User} label="Full Name" value={profile.nama} />
+            <InfoRow icon={Hash} label="NIM / Intern ID" value={profile.nim} />
+            <InfoRow icon={GraduationCap} label="Mentor" value={profile.pembimbing} />
             <InfoRow
               icon={Calendar}
-              label="Periode Magang"
+              label="Internship Period"
               value={`${formatDateShort(startDate)} — ${formatDateShort(endDate)}`}
             />
-            <InfoRow icon={MapPin} label="Lokasi Kantor" value={profile.offices?.nama || '-'} />
+            <InfoRow icon={MapPin} label="Office Location" value={profile.offices?.nama || '-'} />
             <InfoRow icon={Mail} label="Email" value={user.email || ''} />
           </>
         )}
@@ -266,8 +266,8 @@ export default function ProfilePage() {
           className="card divide-y divide-neutral-100"
         >
           {[
-            { icon: Bell, label: 'Notifikasi', desc: 'Pengaturan pemberitahuan', action: () => router.push('/notifications') },
-            { icon: ShieldCheck, label: 'Keamanan', desc: 'Ubah password', action: () => setIsPasswordModalOpen(true) },
+            { icon: Bell, label: 'Notifications', desc: 'Notification settings', action: () => router.push('/notifications') },
+            { icon: ShieldCheck, label: 'Security', desc: 'Change password', action: () => setIsPasswordModalOpen(true) },
           ].map((item) => (
             <button
               key={item.label}
@@ -298,7 +298,7 @@ export default function ProfilePage() {
             onClick={() => setShowLogoutConfirm(true)}
             className="btn btn-danger btn-full btn-lg w-full"
           >
-            <LogOut size={18} /> Keluar dari Akun
+            <LogOut size={18} /> Logout
           </button>
         </motion.div>
       )}
@@ -311,14 +311,14 @@ export default function ProfilePage() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
           >
-            <h3 className="text-xl font-bold text-neutral-900 mb-2">Keluar dari Akun</h3>
-            <p className="text-sm text-neutral-500 mb-6">Apakah Anda yakin ingin keluar dari aplikasi TelIntern?</p>
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">Logout</h3>
+            <p className="text-sm text-neutral-500 mb-6">Are you sure you want to log out of TelIntern?</p>
             <div className="flex gap-3">
               <button 
                 onClick={() => setShowLogoutConfirm(false)}
                 className="flex-1 py-2.5 rounded-xl border border-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-50"
               >
-                Batal
+                Cancel
               </button>
               <button 
                 onClick={async () => {
@@ -328,7 +328,7 @@ export default function ProfilePage() {
                 }} 
                 className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600"
               >
-                Ya, Keluar
+                Yes, Logout
               </button>
             </div>
           </motion.div>
@@ -358,11 +358,11 @@ function PasswordChangeModal({ onClose }: { onClose: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 6) {
-      setError('Password minimal 6 karakter');
+      setError('Password must be at least 6 characters');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Password tidak cocok');
+      setError('Passwords do not match');
       return;
     }
 
@@ -387,20 +387,20 @@ function PasswordChangeModal({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
       >
-        <h3 className="text-xl font-bold text-neutral-900 mb-4">Ubah Password</h3>
+        <h3 className="text-xl font-bold text-neutral-900 mb-4">Change Password</h3>
         
         {success ? (
           <div className="text-center py-4">
             <div className="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Check className="text-success-600" />
             </div>
-            <p className="text-success-700 font-medium">Password berhasil diubah!</p>
+            <p className="text-success-700 font-medium">Password changed successfully!</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && <p className="text-danger-600 text-sm font-medium">{error}</p>}
             <div>
-              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">Password Baru</label>
+              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">New Password</label>
               <input 
                 type="password" 
                 value={password}
@@ -410,7 +410,7 @@ function PasswordChangeModal({ onClose }: { onClose: () => void }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">Konfirmasi Password Baru</label>
+              <label className="block text-xs font-semibold text-neutral-500 uppercase mb-1">Confirm New Password</label>
               <input 
                 type="password" 
                 value={confirmPassword}
@@ -425,14 +425,14 @@ function PasswordChangeModal({ onClose }: { onClose: () => void }) {
                 onClick={onClose}
                 className="flex-1 py-2 rounded-xl text-neutral-600 font-medium hover:bg-neutral-100"
               >
-                Batal
+                Cancel
               </button>
               <button 
                 type="submit"
                 disabled={loading}
                 className="flex-1 py-2 rounded-xl bg-primary-600 text-white font-medium hover:bg-primary-700 disabled:opacity-50"
               >
-                {loading ? 'Menyimpan...' : 'Simpan'}
+                {loading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </form>

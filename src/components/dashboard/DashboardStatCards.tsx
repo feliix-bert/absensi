@@ -6,23 +6,23 @@ import { getRemainingDays } from '@/lib/utils';
 const STATS = (remaining: number, stats: any) => [
   {
     icon: CheckCircle2,
-    label: 'Hadir',
+    label: 'Present',
     value: stats?.attendedDays || 0,
-    sub: `dari ${stats?.totalDays || 30} hari`,
+    sub: `of ${stats?.totalDays || 30} days`,
     iconBg: 'bg-emerald-50 text-emerald-600',
   },
   {
     icon: Flame,
     label: 'Streak',
     value: stats?.streakDays || 0,
-    sub: 'hari berturut',
+    sub: 'consecutive days',
     iconBg: 'bg-amber-50 text-amber-600',
   },
   {
     icon: Calendar,
-    label: 'Sisa hari magang',
+    label: 'Remaining days',
     value: remaining,
-    sub: 'hari lagi',
+    sub: 'days left',
     iconBg: 'bg-primary-50 text-primary-600',
   },
 ];

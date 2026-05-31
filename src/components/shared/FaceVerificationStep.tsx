@@ -151,14 +151,14 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-1">
           <ScanFace size={20} className="text-primary-600" />
-          <h2 className="text-neutral-900 font-bold text-body-lg">Verifikasi Wajah</h2>
+          <h2 className="text-neutral-900 font-bold text-body-lg">Face Verification</h2>
         </div>
         <p className="text-neutral-500 text-body-sm">
           {verifyState === 'not_enrolled'
-            ? 'Wajah belum terdaftar'
+            ? 'Face not enrolled'
             : verifyState === 'verified'
-            ? 'Wajah terverifikasi!'
-            : 'Arahkan wajah ke kamera lalu tekan tombol verifikasi'}
+            ? 'Face verified!'
+            : 'Point your face to the camera then press the verify button'}
         </p>
       </div>
 
@@ -182,7 +182,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
                 className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3"
               >
                 <Loader2 size={28} className="text-white animate-spin" />
-                <p className="text-white text-sm font-medium">Memuat model wajah...</p>
+                <p className="text-white text-sm font-medium">Loading face models...</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -225,8 +225,8 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             <div className="w-24 h-24 rounded-full bg-success-500 flex items-center justify-center shadow-lg">
               <ShieldCheck size={44} className="text-white" />
             </div>
-            <p className="text-success-700 font-bold text-center">Wajah berhasil dikenali!</p>
-            <p className="text-neutral-500 text-body-sm text-center">Membuka scanner QR...</p>
+            <p className="text-success-700 font-bold text-center">Face successfully recognized!</p>
+            <p className="text-neutral-500 text-body-sm text-center">Opening QR scanner...</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -238,9 +238,9 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             <ShieldX size={32} className="text-warning-600" />
           </div>
           <div className="text-center">
-            <p className="font-bold text-neutral-900 mb-1">Wajah Belum Terdaftar</p>
+            <p className="font-bold text-neutral-900 mb-1">Face Not Enrolled</p>
             <p className="text-neutral-500 text-body-sm leading-relaxed">
-              Kamu belum mendaftarkan wajah. Daftarkan wajah terlebih dahulu untuk bisa absen.
+              You haven\'t enrolled your face. Please enroll your face first to check in.
             </p>
           </div>
           <Link
@@ -248,7 +248,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             className="btn btn-primary btn-full flex items-center justify-center gap-2"
           >
             <Camera size={16} />
-            Daftarkan Wajah Sekarang
+            Enroll Face Now
             <ExternalLink size={14} />
           </Link>
         </div>
@@ -258,9 +258,9 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
       {verifyState === 'camera_denied' && (
         <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-danger-50 border border-danger-200 w-full text-center">
           <ShieldX size={32} className="text-danger-500" />
-          <p className="font-bold text-neutral-900">Izin Kamera Ditolak</p>
+          <p className="font-bold text-neutral-900">Camera Permission Denied</p>
           <p className="text-neutral-500 text-body-sm leading-relaxed">
-            Akses kamera diperlukan untuk verifikasi wajah. Izinkan akses kamera di pengaturan browser dan muat ulang halaman.
+            Camera access is required for face verification. Please allow camera access in browser settings and reload.
           </p>
         </div>
       )}
@@ -274,7 +274,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             exit={{ opacity: 0 }}
             className="px-4 py-2.5 rounded-xl bg-warning-50 border border-warning-200 text-warning-700 text-body-sm font-medium text-center w-full"
           >
-            Wajah tidak terdeteksi. Pastikan wajahmu terlihat jelas dan pencahayaan cukup.
+            Face not detected. Ensure your face is clearly visible and lighting is sufficient.
           </motion.div>
         )}
         {verifyState === 'mismatch' && (
@@ -284,7 +284,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             exit={{ opacity: 0 }}
             className="px-4 py-2.5 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 text-body-sm font-medium text-center w-full"
           >
-            Wajah tidak dikenali{attemptCount > 1 ? ` (percobaan ke-${attemptCount})` : ''}. Pastikan pencahayaan baik dan wajah menghadap langsung ke kamera.
+            Face not recognized{attemptCount > 1 ? ` (attempt ${attemptCount})` : ''}. Ensure good lighting and face directly to the camera.
           </motion.div>
         )}
       </AnimatePresence>
@@ -298,7 +298,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
             className="btn btn-primary btn-full btn-lg flex items-center justify-center gap-2"
           >
             <ScanFace size={18} />
-            {verifyState === 'mismatch' || verifyState === 'no_face' ? 'Coba Lagi' : 'Verifikasi Wajah'}
+            {verifyState === 'mismatch' || verifyState === 'no_face' ? 'Try Again' : 'Verify Face'}
           </button>
           {(verifyState === 'mismatch' || verifyState === 'no_face') && (
             <button
@@ -306,7 +306,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
               className="btn btn-ghost btn-full flex items-center justify-center gap-2 text-neutral-500"
             >
               <RefreshCw size={15} />
-              Reset Kamera
+              Reset Camera
             </button>
           )}
         </div>
@@ -315,7 +315,7 @@ export function FaceVerificationStep({ storedDescriptor, onVerified }: FaceVerif
       {verifyState === 'capturing' && (
         <div className="flex items-center gap-2 text-neutral-500 text-body-sm">
           <Loader2 size={16} className="animate-spin" />
-          Menganalisis wajah...
+          Analyzing face...
         </div>
       )}
     </div>

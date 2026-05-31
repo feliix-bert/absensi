@@ -133,7 +133,7 @@ export default function FaceEnrollmentPage() {
       // Redirect to dashboard after a brief success animation
       setTimeout(() => router.push('/dashboard'), 2000);
     } catch (err) {
-      setErrorMsg('Terjadi kesalahan tidak terduga. Coba lagi.');
+      setErrorMsg('An unexpected error occurred. Try again.');
       setEnrollState('save_error');
     }
   };
@@ -167,17 +167,17 @@ export default function FaceEnrollmentPage() {
           <div className="w-12 h-12 rounded-xl bg-primary-600 flex items-center justify-center mb-3 shadow-md">
             <ScanFace size={22} className="text-white" />
           </div>
-          <h1 className="text-heading-xl text-neutral-900">Daftarkan Wajah</h1>
+          <h1 className="text-heading-xl text-neutral-900">Enroll Face</h1>
           <p className="text-body-sm text-neutral-500 mt-1 leading-relaxed max-w-[260px]">
             {enrollState === 'success'
-              ? 'Pendaftaran wajah berhasil!'
-              : 'Posisikan wajahmu di dalam lingkaran lalu tekan tombol di bawah.'}
+              ? 'Face enrolled successfully!'
+              : 'Position your face inside the circle then press the button below.'}
           </p>
         </div>
 
         {/* Progress steps */}
         <div className="flex items-center gap-2 mb-6">
-          {['Akun dibuat', 'Daftarkan wajah'].map((label, i) => (
+          {['Account created', 'Enroll face'].map((label, i) => (
             <div key={label} className="flex items-center gap-2 flex-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all
                 ${i === 0 ? 'bg-success-500 text-white' : 'bg-primary-600 text-white'}`}>
@@ -220,7 +220,7 @@ export default function FaceEnrollmentPage() {
                   className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-3"
                 >
                   <Loader2 size={28} className="text-white animate-spin" />
-                  <p className="text-white text-sm font-medium">Mempersiapkan kamera...</p>
+                  <p className="text-white text-sm font-medium">Preparing camera...</p>
                 </motion.div>
               )}
               {enrollState === 'capturing' && (
@@ -241,7 +241,7 @@ export default function FaceEnrollmentPage() {
                   className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2"
                 >
                   <Loader2 size={28} className="text-primary-400 animate-spin" />
-                  <p className="text-white text-sm font-medium">Menyimpan data wajah...</p>
+                  <p className="text-white text-sm font-medium">Saving face data...</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -269,8 +269,8 @@ export default function FaceEnrollmentPage() {
                 />
               </div>
               <div className="text-center">
-                <p className="font-bold text-neutral-900 text-lg">Wajah Berhasil Didaftarkan!</p>
-                <p className="text-neutral-500 text-body-sm mt-1">Mengarahkan ke dashboard...</p>
+                <p className="font-bold text-neutral-900 text-lg">Face Enrolled Successfully!</p>
+                <p className="text-neutral-500 text-body-sm mt-1">Redirecting to dashboard...</p>
               </div>
             </motion.div>
           )}
@@ -281,9 +281,9 @@ export default function FaceEnrollmentPage() {
           <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-danger-50 border border-danger-200 mb-5 text-center">
             <AlertCircle size={28} className="text-danger-500" />
             <div>
-              <p className="font-bold text-neutral-900 mb-1">Izin Kamera Ditolak</p>
+              <p className="font-bold text-neutral-900 mb-1">Camera Permission Denied</p>
               <p className="text-neutral-500 text-body-sm leading-relaxed">
-                Izinkan akses kamera di pengaturan browser, lalu muat ulang halaman ini.
+                Allow camera access in browser settings, then reload this page.
               </p>
             </div>
           </div>
@@ -300,7 +300,7 @@ export default function FaceEnrollmentPage() {
             >
               <AlertCircle size={16} className="text-warning-600 shrink-0 mt-0.5" />
               <p className="text-warning-700 text-body-sm leading-relaxed">
-                Wajah tidak terdeteksi. Pastikan wajahmu terlihat jelas, pencahayaan cukup, dan tidak ada penghalang.
+                No face detected. Ensure your face is clearly visible, well-lit, and unobstructed.
               </p>
             </motion.div>
           )}
@@ -313,7 +313,7 @@ export default function FaceEnrollmentPage() {
             >
               <AlertCircle size={16} className="text-danger-500 shrink-0 mt-0.5" />
               <p className="text-danger-700 text-body-sm leading-relaxed">
-                {errorMsg || 'Gagal menyimpan data wajah. Coba lagi.'}
+                {errorMsg || 'Failed to save face data. Try again.'}
               </p>
             </motion.div>
           )}
@@ -327,7 +327,7 @@ export default function FaceEnrollmentPage() {
             id="face-enroll-capture"
           >
             <Camera size={18} />
-            Ambil Foto Wajah
+            Capture Face Photo
           </button>
         )}
 
@@ -337,16 +337,16 @@ export default function FaceEnrollmentPage() {
             className="btn btn-primary btn-full btn-lg flex items-center justify-center gap-2"
           >
             <RefreshCw size={16} />
-            Coba Lagi
+            Try Again
           </button>
         )}
 
         {(enrollState === 'loading' || enrollState === 'capturing' || enrollState === 'saving') && (
           <div className="flex items-center justify-center gap-2 py-3 text-neutral-500 text-body-sm">
             <Loader2 size={16} className="animate-spin" />
-            {enrollState === 'loading' && 'Memuat...'}
-            {enrollState === 'capturing' && 'Menganalisis wajah...'}
-            {enrollState === 'saving' && 'Menyimpan...'}
+            {enrollState === 'loading' && 'Loading...'}
+            {enrollState === 'capturing' && 'Analyzing face...'}
+            {enrollState === 'saving' && 'Saving...'}
           </div>
         )}
 
@@ -357,11 +357,11 @@ export default function FaceEnrollmentPage() {
               href="/dashboard"
               className="text-neutral-400 text-body-sm hover:text-neutral-600 transition-colors inline-flex items-center gap-1"
             >
-              Lewati dulu, daftarkan nanti
+              Skip for now, enroll later
               <ArrowRight size={13} />
             </Link>
             <p className="text-neutral-400 text-[11px] mt-1">
-              (Kamu tidak bisa absen tanpa mendaftarkan wajah)
+              (You cannot check in without enrolling your face)
             </p>
           </div>
         )}

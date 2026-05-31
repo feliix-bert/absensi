@@ -1,16 +1,16 @@
 import Link from 'next/link';
 
 const LINKS = [
-  { label: 'Masuk', href: '/login' },
-  { label: 'Daftar', href: '/signup' },
-  { label: 'Fitur', href: '#fitur' },
-  { label: 'Cara Kerja', href: '#cara-kerja' },
+  { label: 'Login', href: '/login' },
+  { label: 'Sign Up', href: '/signup' },
+  { label: 'Features', href: '#fitur' },
+  { label: 'How it works', href: '#cara-kerja' },
 ];
 
 const BRAND_VALUES = [
-  { dot: 'bg-primary-500', text: 'Terverifikasi GPS' },
-  { dot: 'bg-success-500', text: 'Data Aman' },
-  { dot: 'bg-secondary-400', text: 'Akses 24/7' },
+  { dot: 'bg-primary-500', text: 'GPS Verified' },
+  { dot: 'bg-success-500', text: 'Secure Data' },
+  { dot: 'bg-secondary-400', text: '24/7 Access' },
 ];
 
 export function LandingFooter() {
@@ -82,12 +82,12 @@ export function LandingFooter() {
         {/* Bottom rule + copyright */}
         <div className="mt-10 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[0.8125rem] text-white/25">
-            © 2026 Telkom Indonesia. Hak cipta dilindungi.
+            © 2026 Telkom Indonesia. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-[0.8125rem] text-white/20">
-            <span>Privasi</span>
+            <span>Privacy</span>
             <span className="w-1 h-1 rounded-full bg-white/10" />
-            <span>Ketentuan</span>
+            <span>Terms</span>
           </div>
         </div>
       </div>

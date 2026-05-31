@@ -23,11 +23,11 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { SidebarLocationStatus } from './SidebarLocationStatus';
 
 const SIDEBAR_ITEMS = [
-  { id: 'dashboard', label: 'Beranda', href: '/dashboard', icon: LayoutDashboard },
-  { id: 'scan', label: 'Scan Absensi', href: '/scan', icon: QrCode },
-  { id: 'history', label: 'Riwayat Absensi', href: '/history', icon: History },
-  { id: 'notifications', label: 'Notifikasi', href: '/notifications', icon: BellIcon },
-  { id: 'profile', label: 'Profil Saya', href: '/profile', icon: User },
+  { id: 'dashboard', label: 'Home', href: '/dashboard', icon: LayoutDashboard },
+  { id: 'scan', label: 'Scan Attendance', href: '/scan', icon: QrCode },
+  { id: 'history', label: 'Attendance History', href: '/history', icon: History },
+  { id: 'notifications', label: 'Notifications', href: '/notifications', icon: BellIcon },
+  { id: 'profile', label: 'My Profile', href: '/profile', icon: User },
 ];
 
 export function Sidebar() {

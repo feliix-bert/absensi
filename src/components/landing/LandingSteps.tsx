@@ -7,43 +7,43 @@ const STEPS = [
   {
     num: '01',
     icon: UserPlus,
-    title: 'Daftar akun',
-    desc: 'Isi data magang dan lokasi kantor dalam dua langkah singkat.',
+    title: 'Register account',
+    desc: 'Fill in internship data and office location in two short steps.',
     bg: 'bg-secondary-800',
     iconBg: 'bg-secondary-600',
     accentColor: '#1A5580',
     lightBg: 'bg-secondary-50',
     lightBorder: 'border-secondary-100',
     numGradient: 'from-secondary-100 to-secondary-200',
-    tag: 'Langkah 1',
+    tag: 'Step 1',
     tagColor: 'bg-secondary-100 text-secondary-700',
   },
   {
     num: '02',
     icon: MapPin,
-    title: 'Validasi lokasi',
-    desc: 'Izinkan GPS agar sistem memverifikasi radius kantor secara akurat.',
+    title: 'Location validation',
+    desc: 'Allow GPS so the system verifies the office radius accurately.',
     bg: 'bg-primary-700',
     iconBg: 'bg-primary-500',
     accentColor: '#CC0000',
     lightBg: 'bg-primary-50',
     lightBorder: 'border-primary-100',
     numGradient: 'from-primary-100 to-primary-200',
-    tag: 'Langkah 2',
+    tag: 'Step 2',
     tagColor: 'bg-primary-100 text-primary-700',
   },
   {
     num: '03',
     icon: QrCode,
-    title: 'Scan & selesai',
-    desc: 'Scan QR di kantor — absensi masuk dan keluar tercatat otomatis.',
+    title: 'Scan & done',
+    desc: 'Scan QR at the office — check-in and check-out attendance is recorded automatically.',
     bg: 'bg-success-700',
     iconBg: 'bg-success-500',
     accentColor: '#059669',
     lightBg: 'bg-success-50',
     lightBorder: 'border-success-100',
     numGradient: 'from-success-100 to-success-200',
-    tag: 'Langkah 3',
+    tag: 'Step 3',
     tagColor: 'bg-success-100 text-success-700',
   },
 ];
@@ -73,15 +73,15 @@ export function LandingSteps() {
             <div className="inline-flex items-center gap-2.5 mb-4 px-3.5 py-1.5 rounded-full bg-secondary-100 border border-secondary-200">
               <div className="w-1.5 h-1.5 rounded-full bg-secondary-600" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-600">
-                Cara Kerja
+                How it Works
               </span>
             </div>
             <h2 className="text-[1.65rem] md:text-[2rem] font-bold text-neutral-900 leading-tight tracking-[-0.02em]">
-              Tiga langkah, absensi selesai
+              Three steps, attendance done
             </h2>
           </div>
           <p className="text-neutral-500 text-[0.875rem] max-w-[280px] md:text-right leading-relaxed">
-            Dari pendaftaran hingga scan QR — cukup sekali setup, langsung jalan.
+            From registration to QR scan — just one setup, ready to go.
           </p>
         </div>
 
@@ -173,8 +173,8 @@ export function LandingSteps() {
         >
           <CheckCircle size={18} className="text-success-500 shrink-0" />
           <p className="text-[0.9rem] text-neutral-700">
-            <span className="font-semibold text-neutral-900">Tidak perlu instalasi. </span>
-            Berjalan langsung di browser — desktop maupun mobile.
+            <span className="font-semibold text-neutral-900">No installation needed. </span>
+            Runs directly in the browser — desktop or mobile.
           </p>
         </motion.div>
 

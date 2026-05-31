@@ -20,8 +20,8 @@ export function ProfileSummary({ profile }: { profile: any }) {
 
         <dl className="space-y-4 pt-4">
           {[
-            { icon: GraduationCap, label: 'Pembimbing', value: profile.pembimbing },
-            { icon: MapPin, label: 'Kantor', value: profile.offices?.nama || '-' },
+            { icon: GraduationCap, label: 'Mentor', value: profile.pembimbing },
+            { icon: MapPin, label: 'Office', value: profile.offices?.nama || '-' },
           ].map((row) => (
             <div key={row.label} className="flex gap-3">
               <div className="w-8 h-8 rounded-lg bg-neutral-50 flex items-center justify-center shrink-0">
@@ -43,7 +43,7 @@ export function ProfileSummary({ profile }: { profile: any }) {
           href="/profile"
           className="mt-5 flex items-center justify-center gap-1 w-full py-2.5 rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors"
         >
-          Profil lengkap <ChevronRight size={14} />
+          Full profile <ChevronRight size={14} />
         </Link>
       </div>
     </aside>

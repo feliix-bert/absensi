@@ -6,21 +6,21 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 const signUpSchema = z.object({
-  nama: z.string().min(2, 'Nama minimal 2 karakter'),
-  nim: z.string().min(3, 'NIM/NIS/ID Magang minimal 3 karakter'),
-  pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
-  mulai_magang: z.string().min(1, 'Tanggal mulai harus diisi'),
-  selesai_magang: z.string().min(1, 'Tanggal selesai harus diisi'),
-  email: z.string().email('Email tidak valid'),
-  password: z.string().min(6, 'Password minimal 6 karakter'),
+  nama: z.string().min(2, 'Name must be at least 2 characters'),
+  nim: z.string().min(3, 'NIM/NIS/Intern ID must be at least 3 characters'),
+  pembimbing: z.string().min(2, 'Mentor name must be at least 2 characters'),
+  mulai_magang: z.string().min(1, 'Start date is required'),
+  selesai_magang: z.string().min(1, 'End date is required'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
 const updateProfileSchema = z.object({
-  nama: z.string().min(2, 'Nama minimal 2 karakter'),
-  nim: z.string().min(3, 'NIM/NIS/ID Magang minimal 3 karakter'),
-  pembimbing: z.string().min(2, 'Nama pembimbing minimal 2 karakter'),
-  mulai_magang: z.string().min(1, 'Tanggal mulai harus diisi'),
-  selesai_magang: z.string().min(1, 'Tanggal selesai harus diisi'),
+  nama: z.string().min(2, 'Name must be at least 2 characters'),
+  nim: z.string().min(3, 'NIM/NIS/Intern ID must be at least 3 characters'),
+  pembimbing: z.string().min(2, 'Mentor name must be at least 2 characters'),
+  mulai_magang: z.string().min(1, 'Start date is required'),
+  selesai_magang: z.string().min(1, 'End date is required'),
 })
 
 export async function updateProfile(prevState: any, formData: FormData) {
@@ -32,7 +32,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
   const parsed = updateProfileSchema.safeParse(data)
 
   if (!parsed.success) {
-    return { error: parsed.error?.issues?.[0]?.message || 'Validasi gagal' }
+    return { error: parsed.error?.issues?.[0]?.message || 'Validation failed' }
   }
 
   const { error } = await supabase
@@ -56,7 +56,7 @@ export async function signUp(prevState: any, formData: FormData) {
   const parsed = signUpSchema.safeParse(data)
 
   if (!parsed.success) {
-    return { error: parsed.error?.issues?.[0]?.message || 'Validasi gagal' }
+    return { error: parsed.error?.issues?.[0]?.message || 'Validation failed' }
   }
 
   const { email, password, ...metadata } = parsed.data
@@ -75,7 +75,7 @@ export async function signUp(prevState: any, formData: FormData) {
 
   // Jika session kosong, berarti Supabase masih meminta verifikasi email
   if (!authData.session) {
-    return { error: 'Verifikasi Email masih aktif. Silakan matikan opsi "Confirm email" di Dashboard Supabase > Authentication > Providers > Email.' }
+    return { error: 'Email Verification is still active. Please disable "Confirm email" in Supabase Dashboard > Authentication > Providers > Email.' }
   }
 
   revalidatePath('/', 'layout')
@@ -83,8 +83,8 @@ export async function signUp(prevState: any, formData: FormData) {
 }
 
 const signInSchema = z.object({
-  email: z.string().email('Email tidak valid'),
-  password: z.string().min(1, 'Password harus diisi'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(1, 'Password is required'),
 })
 
 export async function signIn(prevState: any, formData: FormData) {
@@ -94,7 +94,7 @@ export async function signIn(prevState: any, formData: FormData) {
   const parsed = signInSchema.safeParse(data)
 
   if (!parsed.success) {
-    return { error: parsed.error?.issues?.[0]?.message || 'Validasi gagal' }
+    return { error: parsed.error?.issues?.[0]?.message || 'Validation failed' }
   }
 
   const { email, password } = parsed.data

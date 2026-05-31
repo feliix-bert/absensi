@@ -29,10 +29,10 @@ function formatNotifTime(iso: string) {
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Baru saja';
-  if (diffMins < 60) return `${diffMins} menit lalu`;
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} mins ago`;
   const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} jam lalu`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 }
 
@@ -83,14 +83,14 @@ export default function NotificationsPage() {
     <div className="max-w-2xl mx-auto space-y-5 pb-10">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-heading-lg text-neutral-900">Notifikasi</h2>
+          <h2 className="text-heading-lg text-neutral-900">Notifications</h2>
           <p className="text-body-sm text-neutral-500 mt-0.5">
-            {unreadCount > 0 ? `${unreadCount} belum dibaca` : 'Semua sudah dibaca'}
+            {unreadCount > 0 ? `${unreadCount} unread` : 'All read'}
           </p>
         </div>
         {unreadCount > 0 && (
           <button type="button" onClick={markAllRead} className="btn btn-ghost btn-sm text-primary-600">
-            <CheckCheck size={16} /> Tandai semua
+            <CheckCheck size={16} /> Mark all read
           </button>
         )}
       </div>

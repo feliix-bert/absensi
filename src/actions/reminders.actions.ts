@@ -26,7 +26,7 @@ export async function toggleReminder(id: string, currentStatus: boolean) {
 
   if (error) {
     console.error(error)
-    return { error: 'Gagal mengubah status pengingat' }
+    return { error: 'Failed to update reminder status' }
   }
 
   revalidatePath('/dashboard')
@@ -39,7 +39,7 @@ export async function addReminder(formData: FormData) {
   if (!user) return { error: 'Unauthorized' }
 
   const title = formData.get('title') as string
-  if (!title || !title.trim()) return { error: 'Judul tidak boleh kosong' }
+  if (!title || !title.trim()) return { error: 'Title cannot be empty' }
 
   const dueDateStr = formData.get('dueDate') as string | null
   let dueDate = null;
@@ -61,7 +61,7 @@ export async function addReminder(formData: FormData) {
 
   if (error) {
     console.error(error)
-    return { error: 'Gagal menambahkan pengingat' }
+    return { error: 'Failed to add reminder' }
   }
 
   revalidatePath('/dashboard')
@@ -77,7 +77,7 @@ export async function deleteReminder(id: string) {
 
   if (error) {
     console.error(error)
-    return { error: 'Gagal menghapus pengingat' }
+    return { error: 'Failed to delete reminder' }
   }
 
   revalidatePath('/dashboard')

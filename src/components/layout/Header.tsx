@@ -43,7 +43,7 @@ export function Header({ title, showSearch = false }: HeaderProps) {
         {showSearch && (
           <button
             className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
-            aria-label="Cari"
+            aria-label="Search"
           >
             <Search size={18} />
           </button>
@@ -53,7 +53,7 @@ export function Header({ title, showSearch = false }: HeaderProps) {
         <Link
           href="/notifications"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
-          aria-label={`Notifikasi${unreadCount > 0 ? ` (${unreadCount} belum dibaca)` : ''}`}
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         >
           <BellIcon size={18} />
           {unreadCount > 0 && (

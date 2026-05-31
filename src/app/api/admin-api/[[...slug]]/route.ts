@@ -52,33 +52,33 @@ async function handlePost(path: string, req: NextRequest) {
 
   if (path === 'auth/login') {
     const { nik, password } = await req.json();
-    if (!nik || !password) return NextResponse.json({ success: false, error: 'NIK dan password wajib diisi.' }, { status: 400 });
+    if (!nik || !password) return NextResponse.json({ success: false, error: 'NIK and password are required.' }, { status: 400 });
 
     const cleanNIK = nik.trim().toUpperCase();
     const { data: user, error } = await supabase.from('users').select('*').eq('nik', cleanNIK).maybeSingle();
 
-    if (error) return NextResponse.json({ success: false, error: 'Terjadi kesalahan server.' }, { status: 500 });
-    if (!user) return NextResponse.json({ success: false, error: 'NIK tidak ditemukan.' }, { status: 401 });
-    if (!user.isActive) return NextResponse.json({ success: false, error: 'Akun dinonaktifkan.' }, { status: 403 });
+    if (error) return NextResponse.json({ success: false, error: 'Server error occurred.' }, { status: 500 });
+    if (!user) return NextResponse.json({ success: false, error: 'NIK not found.' }, { status: 401 });
+    if (!user.isActive) return NextResponse.json({ success: false, error: 'Account disabled.' }, { status: 403 });
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) return NextResponse.json({ success: false, error: 'Password salah.' }, { status: 401 });
+    if (!isPasswordValid) return NextResponse.json({ success: false, error: 'Incorrect password.' }, { status: 401 });
 
     const tokenPayload = { id: user.id, nik: user.nik, name: user.name, role: user.role, cohort: user.cohort };
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
-    return NextResponse.json({ success: true, message: `Selamat datang, ${user.name}!`, token, user: tokenPayload });
+    return NextResponse.json({ success: true, message: `Welcome, ${user.name}!`, token, user: tokenPayload });
   }
 
   if (path === 'auth/register') {
     const { name, nik, password } = await req.json();
     if (!name || !nik || !password || password.length < 6) {
-      return NextResponse.json({ success: false, error: 'Data tidak valid.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Invalid data.' }, { status: 400 });
     }
 
     const nikUpper = nik.trim().toUpperCase();
     const { data: existing } = await supabase.from('users').select('*').eq('nik', nikUpper).maybeSingle();
-    if (existing) return NextResponse.json({ success: false, error: 'NIK sudah terdaftar.' }, { status: 409 });
+    if (existing) return NextResponse.json({ success: false, error: 'NIK is already registered.' }, { status: 409 });
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const newUser = {
@@ -93,10 +93,10 @@ async function handlePost(path: string, req: NextRequest) {
     };
 
     const { error } = await supabase.from('users').insert(newUser);
-    if (error) return NextResponse.json({ success: false, error: 'Gagal daftar.' }, { status: 500 });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to register.' }, { status: 500 });
 
     const token = jwt.sign({ id: newUser.id, nik: newUser.nik, name: newUser.name, role: newUser.role, cohort: newUser.cohort }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-    return NextResponse.json({ success: true, message: 'Akun berhasil dibuat!', token, user: newUser }, { status: 201 });
+    return NextResponse.json({ success: true, message: 'Account created successfully!', token, user: newUser }, { status: 201 });
   }
 
   if (path === 'admin/users') {
@@ -105,11 +105,11 @@ async function handlePost(path: string, req: NextRequest) {
 
     const { name, nik, role, password, cohort } = await req.json();
     const allowedRoles = ['intern', 'admin', 'manager'];
-    if (!allowedRoles.includes(role)) return NextResponse.json({ success: false, error: 'Role tidak valid.' }, { status: 400 });
+    if (!allowedRoles.includes(role)) return NextResponse.json({ success: false, error: 'Invalid role.' }, { status: 400 });
 
     const nikUpper = nik.trim().toUpperCase();
     const { data: existing } = await supabase.from('users').select('*').eq('nik', nikUpper).maybeSingle();
-    if (existing) return NextResponse.json({ success: false, error: 'NIK sudah terdaftar.' }, { status: 409 });
+    if (existing) return NextResponse.json({ success: false, error: 'NIK is already registered.' }, { status: 409 });
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const newUser = {
@@ -121,9 +121,9 @@ async function handlePost(path: string, req: NextRequest) {
     };
 
     const { error } = await supabase.from('users').insert(newUser);
-    if (error) return NextResponse.json({ success: false, error: 'Gagal tambah user.' }, { status: 500 });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to add user.' }, { status: 500 });
     
-    return NextResponse.json({ success: true, message: 'User berhasil ditambahkan.', user: newUser }, { status: 201 });
+    return NextResponse.json({ success: true, message: 'User added successfully.', user: newUser }, { status: 201 });
   }
 
   if (path === 'admin/reset-password') {
@@ -131,15 +131,15 @@ async function handlePost(path: string, req: NextRequest) {
     try { user = requireAuth(req); requireAdmin(user); } catch (e: any) { return handleAuthError(e); }
 
     const { userId, newPassword } = await req.json();
-    if (newPassword.length < 6) return NextResponse.json({ success: false, error: 'Password min 6 karakter.' }, { status: 400 });
+    if (newPassword.length < 6) return NextResponse.json({ success: false, error: 'Password must be at least 6 characters.' }, { status: 400 });
 
     const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
     const { error } = await supabase.from('users').update({
       passwordHash, passwordResetAt: new Date().toISOString(), passwordResetBy: user.nik
     }).eq('id', userId);
 
-    if (error) return NextResponse.json({ success: false, error: 'Gagal reset password.' }, { status: 500 });
-    return NextResponse.json({ success: true, message: 'Password berhasil direset.' });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to reset password.' }, { status: 500 });
+    return NextResponse.json({ success: true, message: 'Password reset successfully.' });
   }
 
   return NextResponse.json({ success: false, error: 'Route not found' }, { status: 404 });
@@ -153,7 +153,7 @@ async function handleGet(path: string, req: NextRequest) {
     try { user = requireAuth(req); } catch (e: any) { return handleAuthError(e); }
 
     const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
-    if (!dbUser || !dbUser.isActive) return NextResponse.json({ success: false, error: 'Akun tidak aktif.' }, { status: 401 });
+    if (!dbUser || !dbUser.isActive) return NextResponse.json({ success: false, error: 'Account is inactive.' }, { status: 401 });
 
     return NextResponse.json({
       success: true,
@@ -166,7 +166,7 @@ async function handleGet(path: string, req: NextRequest) {
     try { user = requireAuth(req); requireAdminOrManager(user); } catch (e: any) { return handleAuthError(e); }
 
     const { data: users, error } = await supabase.from('users').select('*').order('createdAt', { ascending: false });
-    if (error) return NextResponse.json({ success: false, error: 'Gagal ambil data.' }, { status: 500 });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to fetch data.' }, { status: 500 });
 
     return NextResponse.json({ success: true, users, total: users?.length || 0 });
   }
@@ -187,7 +187,7 @@ async function handlePut(path: string, req: NextRequest) {
     try { user = requireAuth(req); requireAdmin(user); } catch (e: any) { return handleAuthError(e); }
 
     const { name, role, cohort, isActive } = await req.json();
-    if (id === user.id && isActive === false) return NextResponse.json({ success: false, error: 'Anda tidak dapat menonaktifkan akun Anda sendiri.' }, { status: 400 });
+    if (id === user.id && isActive === false) return NextResponse.json({ success: false, error: 'You cannot disable your own account.' }, { status: 400 });
 
     const updates: any = { updatedAt: new Date().toISOString(), updatedBy: user.nik };
     if (name) updates.name = name.trim();
@@ -196,9 +196,9 @@ async function handlePut(path: string, req: NextRequest) {
     if (typeof isActive === 'boolean') updates.isActive = isActive;
 
     const { data: updatedUser, error } = await supabase.from('users').update(updates).eq('id', id).select().single();
-    if (error) return NextResponse.json({ success: false, error: 'Gagal update user.' }, { status: 500 });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to update user.' }, { status: 500 });
 
-    return NextResponse.json({ success: true, message: 'User berhasil diperbarui.', user: updatedUser });
+    return NextResponse.json({ success: true, message: 'User updated successfully.', user: updatedUser });
   }
   return NextResponse.json({ success: false, error: 'Route not found' }, { status: 404 });
 }
@@ -211,21 +211,21 @@ async function handleDelete(path: string, req: NextRequest) {
     let user;
     try { user = requireAuth(req); requireAdmin(user); } catch (e: any) { return handleAuthError(e); }
 
-    if (id === user.id) return NextResponse.json({ success: false, error: 'Anda tidak dapat menghapus akun Anda sendiri.' }, { status: 400 });
+    if (id === user.id) return NextResponse.json({ success: false, error: 'You cannot delete your own account.' }, { status: 400 });
 
     const updates = { isActive: false, deletedAt: new Date().toISOString(), deletedBy: user.nik };
     const { error } = await supabase.from('users').update(updates).eq('id', id);
-    if (error) return NextResponse.json({ success: false, error: 'Gagal hapus user.' }, { status: 500 });
+    if (error) return NextResponse.json({ success: false, error: 'Failed to delete user.' }, { status: 500 });
 
-    return NextResponse.json({ success: true, message: 'User telah dinonaktifkan.' });
+    return NextResponse.json({ success: true, message: 'User has been deactivated.' });
   }
   return NextResponse.json({ success: false, error: 'Route not found' }, { status: 404 });
 }
 
 function handleAuthError(e: any) {
-  if (e.message === 'Unauthenticated') return NextResponse.json({ success: false, error: 'Tidak terautentikasi.' }, { status: 401 });
-  if (e.message === 'InvalidToken') return NextResponse.json({ success: false, error: 'Token tidak valid.' }, { status: 401 });
-  if (e.message === 'Forbidden') return NextResponse.json({ success: false, error: 'Akses ditolak.' }, { status: 403 });
+  if (e.message === 'Unauthenticated') return NextResponse.json({ success: false, error: 'Unauthenticated.' }, { status: 401 });
+  if (e.message === 'InvalidToken') return NextResponse.json({ success: false, error: 'Invalid token.' }, { status: 401 });
+  if (e.message === 'Forbidden') return NextResponse.json({ success: false, error: 'Access denied.' }, { status: 403 });
   return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
 }
 

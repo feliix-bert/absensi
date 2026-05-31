@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Users, Building2, Clock } from 'lucide-react';
 
 const TRUST_STATS = [
-  { icon: Users, value: '500+', label: 'Peserta aktif' },
-  { icon: Building2, value: '12', label: 'Divisi Telkom' },
-  { icon: Clock, value: '99.9%', label: 'Uptime sistem' },
+  { icon: Users, value: '500+', label: 'Active interns' },
+  { icon: Building2, value: '12', label: 'Telkom divisions' },
+  { icon: Clock, value: '99.9%', label: 'System uptime' },
 ];
 
 export function LandingCta() {
@@ -103,21 +103,20 @@ export function LandingCta() {
               <div className="flex items-center gap-2.5 mb-5">
                 <div className="w-1 h-3.5 bg-primary-500 rounded-full" />
                 <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                  Siap Mulai?
+                  Ready to Start?
                 </span>
               </div>
 
               <h2 className="text-[1.8rem] md:text-[2.25rem] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-5">
-                Absensi magang yang rapi,<br className="hidden md:block" /> mulai hari ini.
+                Neat internship attendance,<br className="hidden md:block" /> starts today.
               </h2>
               <p className="text-white/45 text-[0.9375rem] md:text-[1rem] leading-relaxed max-w-[420px]">
-                Bergabung bersama peserta magang Telkom Indonesia dan catat
-                kehadiran dengan cara yang lebih terstruktur.
+                Join Telkom Indonesia interns and record attendance in a more structured way.
               </p>
 
               {/* Feature bullets */}
               <div className="mt-7 flex flex-col gap-2.5">
-                {['Tidak perlu instalasi', 'Gratis untuk semua peserta', 'Data tersimpan aman'].map((item) => (
+                {['No installation needed', 'Free for all interns', 'Data stored securely'].map((item) => (
                   <div key={item} className="flex items-center gap-2.5">
                     <CheckCircle2 size={14} className="text-success-400 shrink-0" />
                     <span className="text-[0.875rem] text-white/50 font-medium">{item}</span>
@@ -131,7 +130,7 @@ export function LandingCta() {
 
               {/* Primary CTA card */}
               <div className="w-full md:w-auto flex flex-col gap-3 p-6 rounded-2xl border border-white/[0.1] bg-white/[0.05]">
-                <p className="text-[0.8125rem] text-white/40 font-medium mb-1">Mulai dalam 2 menit</p>
+                <p className="text-[0.8125rem] text-white/40 font-medium mb-1">Start in 2 minutes</p>
                 <Link
                   href="/signup"
                   className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-white text-neutral-900 text-[0.9375rem] font-bold
@@ -140,7 +139,7 @@ export function LandingCta() {
                   id="cta-section-signup"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-500/[0.04] to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                  <span className="relative">Daftar Gratis</span>
+                  <span className="relative">Sign Up Free</span>
                   <div className="w-6 h-6 rounded-md bg-neutral-100 flex items-center justify-center shrink-0 group-hover:bg-primary-50 transition-colors duration-300 relative">
                     <ArrowRight size={14} className="text-neutral-700 group-hover:text-primary-600 transition-colors duration-300" />
                   </div>
@@ -151,12 +150,12 @@ export function LandingCta() {
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/[0.12] text-white/60 text-[0.875rem] font-medium
                     hover:bg-white/[0.05] hover:text-white hover:border-white/[0.2] transition-all duration-300"
                 >
-                  Sudah punya akun? Masuk
+                  Already have an account? Log in
                 </Link>
 
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <CheckCircle2 size={12} className="text-success-400 shrink-0" />
-                  <span className="text-[0.75rem] text-white/30 font-medium">Gratis, tanpa kartu kredit</span>
+                  <span className="text-[0.75rem] text-white/30 font-medium">Free, no credit card required</span>
                 </div>
               </div>
 

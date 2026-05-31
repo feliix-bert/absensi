@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 // ─────────────────────────────────────────────
 export function formatDate(dateStr: string, opts?: Intl.DateTimeFormatOptions): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('id-ID', {
+  return date.toLocaleDateString('en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -25,7 +25,7 @@ export function formatDate(dateStr: string, opts?: Intl.DateTimeFormatOptions): 
 
 export function formatDateShort(dateStr: string): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export function formatTime(timeStr: string): string {
@@ -38,18 +38,18 @@ export function formatTime(timeStr: string): string {
 
 export function getGreeting(): string {
   const hour = new Date().getHours();
-  if (hour < 11) return 'Selamat Pagi';
-  if (hour < 15) return 'Selamat Siang';
-  if (hour < 18) return 'Selamat Sore';
-  return 'Selamat Malam';
+  if (hour < 11) return 'Good Morning';
+  if (hour < 15) return 'Good Afternoon';
+  if (hour < 18) return 'Good Evening';
+  return 'Good Night';
 }
 
 export function getDayName(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { weekday: 'long' });
+  return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' });
 }
 
 export function getMonthYear(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 export function calculateDuration(startDate: string, endDate: string): number {
@@ -117,11 +117,11 @@ export function getStatusBadgeClass(status: AttendanceStatus): string {
 
 export function getStatusLabel(status: AttendanceStatus): string {
   const map: Record<AttendanceStatus, string> = {
-    hadir: 'Hadir',
-    terlambat: 'Terlambat',
-    izin: 'Izin',
-    alpha: 'Alpha',
-    libur: 'Libur',
+    hadir: 'Present',
+    terlambat: 'Late',
+    izin: 'Excused',
+    alpha: 'Absent',
+    libur: 'Holiday',
   };
   return map[status] ?? status;
 }

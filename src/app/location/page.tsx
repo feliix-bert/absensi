@@ -14,12 +14,12 @@ import { useLocation } from '@/hooks/useLocation';
 type DemoState = LocationStatus;
 
 const DEMO_STATES: { key: DemoState; label: string }[] = [
-  { key: 'requesting', label: 'Minta Izin' },
+  { key: 'requesting', label: 'Request Permission' },
   { key: 'loading', label: 'Loading' },
-  { key: 'inside', label: 'Dalam Radius' },
-  { key: 'outside', label: 'Di Luar Radius' },
-  { key: 'low_accuracy', label: 'GPS Lemah' },
-  { key: 'denied', label: 'Ditolak' },
+  { key: 'inside', label: 'Inside Radius' },
+  { key: 'outside', label: 'Outside Radius' },
+  { key: 'low_accuracy', label: 'Weak GPS' },
+  { key: 'denied', label: 'Denied' },
 ];
 
 function RequestingState({ onAllow, office }: { onAllow: () => void, office: any }) {
@@ -39,20 +39,20 @@ function RequestingState({ onAllow, office }: { onAllow: () => void, office: any
           transition={{ duration: 2, repeat: Infinity }}
         />
       </div>
-      <h2 className="text-heading-xl text-neutral-900 mb-3">Izinkan Akses Lokasi</h2>
+      <h2 className="text-heading-xl text-neutral-900 mb-3">Allow Location Access</h2>
       <p className="text-body-md text-neutral-500 max-w-sm leading-relaxed mb-8">
-        TelIntern memerlukan akses lokasi untuk memvalidasi keberadaanmu di area kantor sebelum melakukan absensi.
+        TelIntern needs location access to validate your presence at the office before submitting attendance.
       </p>
       <div className="card p-4 mb-6 w-full max-w-sm text-left">
-        <p className="text-label-sm text-neutral-500 mb-1 uppercase tracking-wide">Lokasi Kantor</p>
-        <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Kantor'}</p>
-        <p className="text-body-sm text-neutral-500 mt-0.5">Kantor Cabang</p>
-        <p className="text-body-sm text-neutral-400 mt-1">Radius: {office?.radius || 150} meter</p>
+        <p className="text-label-sm text-neutral-500 mb-1 uppercase tracking-wide">Office Location</p>
+        <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Office'}</p>
+        <p className="text-body-sm text-neutral-500 mt-0.5">Branch Office</p>
+        <p className="text-body-sm text-neutral-400 mt-1">Radius: {office?.radius || 150} meters</p>
       </div>
       <button onClick={onAllow} className="btn btn-primary btn-lg btn-full max-w-sm">
-        <MapPin size={18} /> Izinkan Akses Lokasi
+        <MapPin size={18} /> Allow Location Access
       </button>
-      <p className="text-body-sm text-neutral-400 mt-3">Data lokasi hanya digunakan saat absensi</p>
+      <p className="text-body-sm text-neutral-400 mt-3">Location data is only used during attendance</p>
     </motion.div>
   );
 }
@@ -77,8 +77,8 @@ function LoadingState() {
           />
         ))}
       </div>
-      <h2 className="text-heading-xl text-neutral-900 mb-2">Mendeteksi Lokasi...</h2>
-      <p className="text-body-md text-neutral-500">Mohon tunggu, GPS sedang aktif</p>
+      <h2 className="text-heading-xl text-neutral-900 mb-2">Detecting Location...</h2>
+      <p className="text-body-md text-neutral-500">Please wait, GPS is active</p>
       <div className="flex items-center gap-1.5 mt-4">
         {[0, 1, 2].map((i) => (
           <motion.div
@@ -111,9 +111,9 @@ function InsideState({ distance, office }: { distance: number, office: any }) {
         </div>
         <div className="absolute inset-0 rounded-full bg-success-100 animate-ping opacity-30" />
       </motion.div>
-      <h2 className="text-heading-xl text-success-700 mb-2">Anda di dalam radius!</h2>
+      <h2 className="text-heading-xl text-success-700 mb-2">You are inside the radius!</h2>
       <p className="text-body-md text-neutral-500 mb-6">
-        Lokasi terdeteksi {formatDistance(distance)} dari kantor — dalam radius {office?.radius || 150}m
+        Location detected {formatDistance(distance)} from office — within {office?.radius || 150}m radius
       </p>
       <div className="card p-4 w-full max-w-sm mb-6">
         <div className="flex items-center gap-3">
@@ -121,13 +121,13 @@ function InsideState({ distance, office }: { distance: number, office: any }) {
             <MapPin size={18} className="text-success-600" />
           </div>
           <div className="text-left">
-            <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Kantor'}</p>
-            <p className="text-body-sm text-neutral-500">GPS aktif · Akurasi tinggi</p>
+            <p className="text-body-md font-semibold text-neutral-900">{office?.nama || 'Office'}</p>
+            <p className="text-body-sm text-neutral-500">GPS active · High accuracy</p>
           </div>
         </div>
       </div>
       <Link href="/scan" className="btn btn-primary btn-lg btn-full max-w-sm">
-        Lanjut ke QR Scanner
+        Continue to QR Scanner
       </Link>
     </motion.div>
   );
@@ -143,22 +143,22 @@ function OutsideState({ distance, onRefresh, office }: { distance: number; onRef
       <div className="w-24 h-24 rounded-full bg-warning-50 flex items-center justify-center mb-6">
         <AlertTriangle size={40} className="text-warning-500" />
       </div>
-      <h2 className="text-heading-xl text-warning-700 mb-2">Di luar area kantor</h2>
+      <h2 className="text-heading-xl text-warning-700 mb-2">Outside office area</h2>
       <p className="text-body-md text-neutral-500 mb-6">
-        Kamu berada ±{formatDistance(distance)} dari kantor.<br />
-        Perlu dalam radius {office?.radius || 150}m untuk absen.
+        You are ±{formatDistance(distance)} from the office.<br />
+        Must be within {office?.radius || 150}m radius to submit attendance.
       </p>
       <div className="card p-4 w-full max-w-sm mb-6 border-warning-200 bg-warning-50">
         <div className="flex items-start gap-3">
           <AlertTriangle size={18} className="text-warning-600 flex-shrink-0 mt-0.5" />
           <div className="text-left">
-            <p className="text-body-sm font-semibold text-warning-800">Absensi tidak dapat dilakukan</p>
-            <p className="text-body-sm text-warning-700 mt-0.5">Datangi lokasi kantor terlebih dahulu lalu coba lagi.</p>
+            <p className="text-body-sm font-semibold text-warning-800">Attendance cannot be submitted</p>
+            <p className="text-body-sm text-warning-700 mt-0.5">Go to the office location first then try again.</p>
           </div>
         </div>
       </div>
       <button type="button" className="btn btn-outline btn-lg max-w-sm w-full" onClick={onRefresh}>
-        <RefreshCw size={16} /> Perbarui Lokasi
+        <RefreshCw size={16} /> Update Location
       </button>
     </motion.div>
   );
@@ -174,19 +174,19 @@ function LowAccuracyState({ onRetry }: { onRetry: () => void }) {
       <div className="w-24 h-24 rounded-full bg-orange-50 flex items-center justify-center mb-6">
         <WifiOff size={40} className="text-orange-500" />
       </div>
-      <h2 className="text-heading-xl text-neutral-900 mb-2">Akurasi GPS Rendah</h2>
-      <p className="text-body-md text-neutral-500 mb-3">Akurasi saat ini: ±85 meter — terlalu rendah untuk validasi</p>
+      <h2 className="text-heading-xl text-neutral-900 mb-2">Low GPS Accuracy</h2>
+      <p className="text-body-md text-neutral-500 mb-3">Current accuracy: ±85 meters — too low for validation</p>
       <div className="card p-4 w-full max-w-sm mb-6 bg-orange-50 border-orange-200">
-        <p className="text-body-sm text-orange-800 font-medium mb-2">Tips meningkatkan akurasi GPS:</p>
+        <p className="text-body-sm text-orange-800 font-medium mb-2">Tips to improve GPS accuracy:</p>
         <ul className="text-body-sm text-orange-700 space-y-1 text-left list-disc list-inside">
-          <li>Pindah ke area terbuka</li>
-          <li>Aktifkan Mode Akurasi Tinggi</li>
-          <li>Tunggu beberapa detik</li>
-          <li>Restart GPS di pengaturan</li>
+          <li>Move to an open area</li>
+          <li>Enable High Accuracy Mode</li>
+          <li>Wait a few seconds</li>
+          <li>Restart GPS in settings</li>
         </ul>
       </div>
       <button type="button" onClick={onRetry} className="btn btn-primary btn-lg max-w-sm w-full">
-        <RefreshCw size={16} /> Coba Lagi
+        <RefreshCw size={16} /> Try Again
       </button>
     </motion.div>
   );
@@ -202,19 +202,19 @@ function DeniedState() {
       <div className="w-24 h-24 rounded-full bg-danger-50 flex items-center justify-center mb-6">
         <MapPin size={40} className="text-danger-500 line-through" />
       </div>
-      <h2 className="text-heading-xl text-neutral-900 mb-2">Izin Lokasi Ditolak</h2>
-      <p className="text-body-md text-neutral-500 mb-6 max-w-sm">Absensi tidak bisa dilakukan karena akses lokasi ditolak. Aktifkan dari pengaturan browser/perangkat.</p>
+      <h2 className="text-heading-xl text-neutral-900 mb-2">Location Permission Denied</h2>
+      <p className="text-body-md text-neutral-500 mb-6 max-w-sm">Attendance cannot be submitted because location access is denied. Enable it from browser/device settings.</p>
       <div className="card p-4 w-full max-w-sm mb-6">
-        <p className="text-body-sm font-medium text-neutral-700 mb-2">Cara mengaktifkan:</p>
+        <p className="text-body-sm font-medium text-neutral-700 mb-2">How to enable:</p>
         <ol className="text-body-sm text-neutral-600 space-y-1 text-left list-decimal list-inside">
-          <li>Buka <strong>Pengaturan</strong> perangkat</li>
-          <li>Pilih <strong>Privasi → Lokasi</strong></li>
-          <li>Aktifkan untuk browser kamu</li>
-          <li>Muat ulang halaman ini</li>
+          <li>Open device <strong>Settings</strong></li>
+          <li>Select <strong>Privacy → Location</strong></li>
+          <li>Enable for your browser</li>
+          <li>Reload this page</li>
         </ol>
       </div>
       <button className="btn btn-outline btn-lg max-w-sm w-full">
-        <Settings size={16} /> Buka Pengaturan
+        <Settings size={16} /> Open Settings
       </button>
     </motion.div>
   );
@@ -237,7 +237,7 @@ export default function LocationPage() {
         <Link href="/dashboard" className="w-9 h-9 rounded-lg flex items-center justify-center text-neutral-500 hover:bg-neutral-100 transition-colors">
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-heading-md font-semibold text-neutral-900">Validasi Lokasi</h1>
+        <h1 className="text-heading-md font-semibold text-neutral-900">Location Validation</h1>
       </header>
 
       {/* Demo state switcher */}

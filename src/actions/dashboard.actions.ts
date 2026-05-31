@@ -99,7 +99,7 @@ export async function getDashboardStats(userId: string) {
           timeZone: 'Asia/Jakarta',
         })
       : null,
-    location: 'Kantor',
+    location: 'Office',
     status: r.status
   }))
 

@@ -11,10 +11,10 @@ export async function saveFaceDescriptor(descriptor: number[]): Promise<{ succes
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Tidak terautentikasi' };
+  if (!user) return { error: 'Not authenticated' };
 
   if (!Array.isArray(descriptor) || descriptor.length !== 128) {
-    return { error: 'Deskriptor wajah tidak valid' };
+    return { error: 'Invalid face descriptor' };
   }
 
   const { error } = await supabase

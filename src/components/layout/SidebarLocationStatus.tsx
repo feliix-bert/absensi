@@ -62,16 +62,16 @@ export function SidebarLocationStatus({ collapsed }: { collapsed: boolean }) {
              isLowAccuracy ? "text-warning-700" :
              isInside ? "text-success-700" : "text-danger-700"
           )}>
-            {distance === null ? 'Mencari lokasi...' :
-             isLowAccuracy ? 'Akurasi GPS rendah' :
-             isInside ? 'Di dalam radius' : 'Di luar area'
+            {distance === null ? 'Finding location...' :
+             isLowAccuracy ? 'Low GPS accuracy' :
+             isInside ? 'Inside radius' : 'Outside area'
             }
           </p>
           {distance !== null && !isLowAccuracy && (
             <p className={cn("text-[10px] truncate", 
               isInside ? "text-success-600" : "text-danger-600"
             )}>
-              ± {distance} m dari kantor
+              ± {distance} m from office
             </p>
           )}
         </div>

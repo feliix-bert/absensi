@@ -91,7 +91,7 @@ export function DashboardReminders({ initialReminders }: { initialReminders: Rem
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ListTodo size={18} className="text-primary-600" />
-          <h2 className="text-sm font-semibold text-neutral-800">Pengingat Tugas</h2>
+          <h2 className="text-sm font-semibold text-neutral-800">Task Reminders</h2>
         </div>
         <span className="text-xs font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">
           {optimisticReminders.filter(r => !r.is_completed).length}
@@ -100,7 +100,7 @@ export function DashboardReminders({ initialReminders }: { initialReminders: Rem
 
       <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
         {optimisticReminders.length === 0 ? (
-          <p className="text-xs text-neutral-400 text-center py-4">Belum ada pengingat.</p>
+          <p className="text-xs text-neutral-400 text-center py-4">No reminders yet.</p>
         ) : (
           optimisticReminders.map((reminder) => (
             <div key={reminder.id} className="flex items-start gap-3 group p-2 -mx-2 rounded-xl hover:bg-neutral-50 transition-colors">
@@ -123,9 +123,9 @@ export function DashboardReminders({ initialReminders }: { initialReminders: Rem
                 {reminder.due_date && !reminder.is_completed && (
                   <span className="text-[10px] text-neutral-400 flex items-center gap-1 mt-0.5">
                     <Calendar size={10} /> 
-                    {new Date(reminder.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {new Date(reminder.due_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {reminder.due_date.includes('T') && new Date(reminder.due_date).getHours() !== 23 && (
-                      <span className="flex items-center gap-0.5 ml-1"><Clock size={10} /> {new Date(reminder.due_date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="flex items-center gap-0.5 ml-1"><Clock size={10} /> {new Date(reminder.due_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                     )}
                   </span>
                 )}
@@ -149,7 +149,7 @@ export function DashboardReminders({ initialReminders }: { initialReminders: Rem
               type="text" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Tambah tugas baru..." 
+              placeholder="Add new task..." 
               className="w-full text-sm bg-neutral-50 border border-neutral-100 rounded-xl py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
               required
               onFocus={() => setShowOptions(true)}

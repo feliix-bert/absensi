@@ -8,12 +8,12 @@ export const metadata: Metadata = {
     template: '%s | TelIntern',
   },
   description:
-    'Platform absensi magang berbasis lokasi dan QR Code untuk peserta magang Telkom Indonesia. Smart, cepat, dan akurat.',
+    'Location and QR Code based internship attendance platform for Telkom Indonesia interns. Smart, fast, and accurate.',
   keywords: ['absensi magang', 'TelIntern', 'Telkom Indonesia', 'attendance system', 'internship'],
   authors: [{ name: 'Telkom Indonesia' }],
   openGraph: {
     title: 'TelIntern — Smart Internship Attendance',
-    description: 'Platform absensi magang berbasis lokasi dan QR Code.',
+    description: 'Location and QR Code based internship attendance platform.',
     type: 'website',
     locale: 'id_ID',
   },
@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
